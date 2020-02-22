@@ -36,7 +36,10 @@
 
 
 * * *
-
+    1.  Bird
+    2.  McHale
+    3.  Parish
+    
 <h2 id="web">開發工具 -- Web 端</h2>
     1.  HTML + CSS
     2.  Jquery + Javascript template 7
