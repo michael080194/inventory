@@ -40,12 +40,14 @@
     2.  Jquery + Javascript template 7
     3.  PHP
 
-<h2 id="web">開發工具--Web端
+<h2 id="web">開發工具--Web端</h2>
+
     1.  HTML + CSS
     2.  Jquery + Javascript template 7
     3.  PHP
-</h2>
+
 <h2 id="app">開發工具--app端</h2>
+
     1.  Cordova
     2.  Framework7 Vue
 
