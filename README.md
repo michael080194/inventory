@@ -48,7 +48,10 @@
     2.  Framework7 Vue
 
 <h2 id="cordova">開發工具--cordova專案 </h2>
-    批次產生 cordova 專案 : sh create_inventory_android.sh
+
+    1.  批次檔範本(MAC版本) 放在 cordova-tool 資料夾
+    2.  請於 MAC 終端機執行 sudo sh create_inventory_android.sh ; 批次產生 cordova 專案 
+
 
 
 
