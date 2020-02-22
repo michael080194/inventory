@@ -44,12 +44,11 @@
     1.  HTML + CSS
     2.  Jquery + Javascript template 7
     3.  PHP
-    1.  HTML + CSS
-    2.  Jquery + Javascript template 7
-    3.  PHP
+
 <h2 id="app">開發工具 -- app 端</h2>
     1.  Cordova
-    2.  Framework7 Vue 
+    2.  Framework7 Vue
+     
 <h2 id="cordova">開發工具 -- cordova 專案 </h2>
     批次產生 cordova 專案 : sh create_inventory_android.sh
 
