@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- <meta http-equiv="refresh" content="3">  -->
+<title> 盤點系統 test Ajax </title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+  table {
+    width:100%;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 15px;
+    text-align: left;
+  }
+  table#t01 tr:nth-child(even) {
+    background-color: #eee;
+  }
+  table#t01 tr:nth-child(odd) {
+   background-color: #fff;
+  }
+  table#t01 th {
+    background-color: lemonchiffon;
+    color: black;
+  }
+
+  .center {
+    margin: auto;
+    width: 60%;
+    border: 3px solid #73AD21;
+    padding: 10px;
+  }
+
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+  }
+
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+   <h2 align="center">顯示結果</h2>
+
+   <div class="loader center"></div>
+    <script>
+        $(document).ready(function () {
+          get_all_data();
+        });
+        function get_all_data(){
+
+        var pass0 = {};
+        pass0.target = "login";
+        pass0.comp_id       = "12846778";
+        pass0.user = "123"
+        pass0.pass = "123"
+
+        $.ajax({
+          url: "http://localhost/php/inventory/api/inventoryApi.php",
+          method:"POST",
+          data:pass0,
+          beforeSend:function(xhr) {
+
+            },
+          success:function(data, xhr, status) {
+              var data1 = JSON.parse(data);
+              msg= data1["msg"];   // if  SUCCESS return content array
+              alert(msg);
+            },
+          complete:function(xhr, status) {
+              $('.loader').css('display','none');
+            },
+          error:function(xhr, status) {
+
+            }
+        })
+        }
+
+    </script>
+</body>
+
+</html>
