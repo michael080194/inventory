@@ -3,7 +3,10 @@ require_once "php/header.php";
 
 $result = "";
 if (isset($_POST['submit'])) {
-    display1();
+  //  insert1();  // 新增一筆資料
+  //  update1();  // update data
+  //  delete1();  // delete data
+   gen_data(); //產生測試資料
 }
 ?>
 
@@ -12,7 +15,7 @@ if (isset($_POST['submit'])) {
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Test SQL</title>
+    <title>盤點系統 Test SQL 語法</title>
   </head>
   <body>
     <h1>Test SQL</h1>
@@ -32,19 +35,20 @@ function insert1()
 {
 
     global $db;
-    $save_type = "addaa";
-    $tbl       = "12846778_inv_user"; //die($sql);
+    $save_type = "ADD";
+    $tbl       = "1284_inv_user"; //die($sql);
 
     $sqlArr          = array();
-    $sqlArr['user']  = "michael";
-    $sqlArr['name']  = "WANG";
-    $sqlArr['pass']  = password_hash("123", PASSWORD_DEFAULT);
-    $sqlArr['email'] = "kyc168.com@msa.hinet.net";
+    $sqlArr['comp_id']  = "1284";
+    $sqlArr['user']  = "1";
+    $sqlArr['name']  = "michael";
+    $sqlArr['pass']  = password_hash("1", PASSWORD_DEFAULT);
+    $sqlArr['email'] = "michael080194@gmail.com";
 
     #取得預設值
     // $return_id = $db->insert($tbl, $sqlArr);
 
-    if ($save_type == "add") {
+    if ($save_type == "ADD") {
         $return_id = $db->sqlReplace($tbl, $sqlArr, "ADD");
     } else {
         $sqlArr['id'] = 3;
@@ -61,7 +65,7 @@ function update1()
 
     global $db;
 
-    $tbl = "12846778_inv_user"; //die($sql);
+    $tbl = "1284_inv_user"; //die($sql);
 
     $sqlArr         = array();
     $sqlArr['user'] = "michaelYY";
@@ -82,7 +86,7 @@ function delete1()
 
     global $db;
 
-    $tbl = "12846778_inv_user"; //die($sql);
+    $tbl = "1284_inv_user"; //die($sql);
 
     $user            = "michael";
     $id              = 6;
@@ -92,31 +96,50 @@ function delete1()
     return true;
 }
 ########################################
-# display
+# 產生測試資料
 ########################################
-function display1()
+function gen_data()
 {
-
     global $db;
+    $tbl       = "1284_inv_user";
+    $sqlArr          = array();
+    $sqlArr['comp_id']  = "1284";
+    $sqlArr['user']  = "1";
+    $sqlArr['name']  = "michael";
+    $sqlArr['pass']  = password_hash("1", PASSWORD_DEFAULT);
+    $sqlArr['email'] = "michael@gmail.com";
+    $return_id = $db->insert($tbl, $sqlArr);
 
-    $tbl = "12846778_inv_user"; //die($sql);
+    $sqlArr          = array();
+    $sqlArr['comp_id']  = "1284";
+    $sqlArr['user']  = "2";
+    $sqlArr['name']  = "may";
+    $sqlArr['pass']  = password_hash("2", PASSWORD_DEFAULT);
+    $sqlArr['email'] = "may@gmail.com";
+    $return_id = $db->insert($tbl, $sqlArr);
 
-    $id     = 3;
-    $sql    = "SELECT * FROM `$tbl` WHERE `id` > '{$id}'";
-    $result = $db->sqlFetch_assoc($sql);
+    $tbl       = "1284_inv_stock";
+    $sqlArr          = array();
+    $sqlArr['comp_id']  = "1284";
+    $sqlArr['c_house']  = "01";
+    $sqlArr['check_date']  = "2020-02-24";
+    $sqlArr['c_partno']  = "NR001";
+    $sqlArr['barcode'] = "471001";
+    $sqlArr['c_descrp']  = "國際牌電視機";
+    $sqlArr['c_unit'] = "台";
+    $sqlArr['c_qtyst'] = 10.5;
+    $return_id = $db->insert($tbl, $sqlArr);
 
-    $all = array();
-    foreach ($result as $item) {
-        $arr1         = array();
-        $arr1['id']   = $item['id'];
-        $arr1['user'] = $item['user'];
-        $arr1['name'] = $item['name'];
-        $all[]        = $arr1;
+    $sqlArr          = array();
+    $sqlArr['comp_id']  = "1284";
+    $sqlArr['c_house']  = "01";
+    $sqlArr['check_date']  = "2020-02-24";
+    $sqlArr['c_partno']  = "SW777";
+    $sqlArr['barcode'] = "471002";
+    $sqlArr['c_descrp']  = "日立牌冷氣機";
+    $sqlArr['c_unit'] = "台";
+    $sqlArr['c_qtyst'] = 5123456;
+    $return_id = $db->insert($tbl, $sqlArr);
 
-        echo "id=" . $item['id'] . "<br>";
-        echo "user=" . $item['user'] . "<br>";
-        echo "name=" . $item['name'] . "<br>";
-    }
-    print_r($all);
     return true;
 }

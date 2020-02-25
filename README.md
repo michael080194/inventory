@@ -52,6 +52,12 @@
     1.  批次檔範本(MAC版本) 放在 cordova-tool 資料夾
     2.  請於 MAC 終端機執行 sudo sh create_inventory_android.sh ; 批次產生 cordova 專案 
 
+<h2 id="other1">其他1 </h2>
+
+    1.  使用本系統先執行 j99_install.php 建立資料庫
+    2.  執行 j99_test-sql.php 的 gen_data() function 可產生測試資料;並可測試sql語法
+    3.  執行 j99_test-ajax.html 可測試用 jquery ajax 與後端API溝通
+
 
 
 

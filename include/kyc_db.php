@@ -1,4 +1,5 @@
 <?php
+// SQL class for kyc define
 // https://johnmorrisonline.com/simple-php-class-prepared-statements-mysqli/
 if (!class_exists('DB')) {
     class DB
@@ -116,7 +117,7 @@ if (!class_exists('DB')) {
         {
             $db     = $this->connect();
             $result = $db->query($query);
-
+            $results = array();
             while ($row = $result->fetch_assoc()) {
                 $results[] = $row;
             }

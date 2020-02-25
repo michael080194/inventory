@@ -44,25 +44,12 @@ function gen_table($tablePrefix)
 {
     $web_path = str_replace("\\", "/", dirname(__FILE__));
     global $db, $WEB;
-    // $result = chk_isTable("{$tablePrefix}_inv_user");
-    // echo $result;
-    // die();
-
-    $sql    = "SHOW TABLES LIKE '{$tablePrefix}_inv_user'"; //die($sql);
-    $result = $db->tableOperation($sql);
-    if (!$result) {
-        echo $sql;
-    } else {
-        echo "FAIL";
-    }
-
-    die();
-
     mk_dir($web_path . "/uploads");
     // $tablePrefix = $WEB['prefix'];
     $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
     $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_stock");
     $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_check");
+    $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_system");
 
     create_table($tablePrefix);
 
@@ -106,26 +93,42 @@ function create_table($tablePrefix = "")
     $db->tableOperation($sql);
 
     $sql = "CREATE TABLE `{$tablePrefix}_inv_stock` (
-    `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
+    `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
     `comp_id`    char(20)      NOT NULL COMMENT '公司別',
     `c_house`    char(20)      NOT NULL COMMENT '倉庫別',
+    `check_date` char(20)      NOT NULL COMMENT '盤點日期',
     `c_partno`   varchar(255)  NOT NULL COMMENT '產品編號',
+    `barcode`    char(20)      NOT NULL COMMENT '絛碼編號',
     `c_descrp`   varchar(255)  NOT NULL COMMENT '產品名稱',
-    `c_qtyst`    varchar(255)           COMMENT '現有庫存',
+    `c_unit`     char(10)      NOT NULL COMMENT '單位',
+    `c_qtyst`    mediumint(7)           COMMENT '現有庫存',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     $db->tableOperation($sql);
 
     $sql = "CREATE TABLE `{$tablePrefix}_inv_check` (
-    `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
+    `id`         int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
     `comp_id`    char(20)      NOT NULL COMMENT '公司別',
     `c_house`    char(20)      NOT NULL COMMENT '倉庫別',
+    `check_date` char(20)      NOT NULL COMMENT '盤點日期',
+    `check_user` char(20)      NOT NULL COMMENT '盤點人員',
     `c_partno`   varchar(255)  NOT NULL COMMENT '產品編號',
-    `c_descrp`   varchar(255)  NOT NULL COMMENT '產品名稱',
-    `c_qty_chk`  varchar(255)           COMMENT '盤點數量',
+    `barcode`    char(20)      NOT NULL COMMENT '絛碼編號',
+    `check_qty`  mediumint(7)           COMMENT '盤點數量',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     $db->tableOperation($sql);
+
+    $sql = "CREATE TABLE `{$tablePrefix}_inv_system` (
+      `id` mediumint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
+      `comp_id`    char(20)      NOT NULL COMMENT '公司別',
+      `c_type`     char(20)      NOT NULL COMMENT '資料類別',
+      `c_desc1`    char(20)      NOT NULL COMMENT '說明一',
+      `c_desc2`    char(20)      NOT NULL COMMENT '說明二',
+      `c_note`     varchar(255)  NOT NULL COMMENT '備註',
+      PRIMARY KEY (`id`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+      $db->tableOperation($sql);
 
     return true;
 }

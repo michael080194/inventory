@@ -65,37 +65,181 @@
    <div class="loader center"></div>
     <script>
         $(document).ready(function () {
-          get_all_data();
+          // test_login(); // 測試 login
+          // test_insertByBarcode(); // 用 barcode 抓取產品資料 並 新增資料至 盤點異動檔
+          delete_check_data(); // delete data by 盤點異動檔 的序號
+          // update_check_data(); // 更新盤點數量 by 盤點異動檔 的序號
+          // list_check_data(); // 顯示 盤點異動檔 資料
         });
-        function get_all_data(){
+        function test_login(){
+          var pass0 = {};
+          pass0.op = "login";
+          pass0.comp_id = "1284";
+          pass0.user = "1"
+          pass0.pass = "1"
 
-        var pass0 = {};
-        pass0.target = "login";
-        pass0.comp_id       = "12846778";
-        pass0.user = "123"
-        pass0.pass = "123"
+          $.ajax({
+            url: "http://localhost/php/inventory/api/inventoryApi.php",
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
 
-        $.ajax({
-          url: "http://localhost/php/inventory/api/inventoryApi.php",
-          method:"POST",
-          data:pass0,
-          beforeSend:function(xhr) {
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                if(msg == "OK"){  // login SUCCESS
+                  alert("Login:"+ msg);
+                } else {
+                  alert("Login 失敗");
+                }
 
-            },
-          success:function(data, xhr, status) {
-              var data1 = JSON.parse(data);
-              msg= data1["msg"];   // if  SUCCESS return content array
-              alert(msg);
-            },
-          complete:function(xhr, status) {
-              $('.loader').css('display','none');
-            },
-          error:function(xhr, status) {
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
 
-            }
-        })
+              }
+          })
         }
 
+        function test_insertByBarcode(){
+          var pass0 = {};
+          pass0.op   = "insertByBarcode";
+          pass0.comp_id  = "1284";
+          pass0.user     = "1"
+          pass0.c_house  = "01";
+          pass0.check_date  = "2020-02-24";
+          pass0.barcode  = "471003";
+          pass0.c_qty    = 1;
+
+          $.ajax({
+            url: "http://localhost/php/inventory/api/inventoryApi.php",
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                console.log(data);
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                // alert(msg);
+                product= data1["responseArray"];   // if  SUCCESS return content array
+                console.log(product["insert_id"]); // 回傳回來該條碼之  新增至 盤點異動檔 的序號
+                console.log(product[0]["c_partno"]); // 回傳回來該條碼之 產品編號
+                console.log(product[0]["c_descrp"]); // 回傳回來該條碼之 產品說明
+                console.log(product[0]["c_unit"]);   // 回傳回來該條碼之 產品單位
+                // $.each(product[0], function(key, value) {
+                //      console.log(key + ":" + value);
+                // });
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function delete_check_data(){
+          var pass0 = {};
+          pass0.op   = "deleteCheckData";
+          pass0.comp_id       = "1284";
+          pass0.c_house       = "01";
+          pass0.user = "1"
+          pass0.check_id  = 2; //delete data by 盤點異動檔 的序號
+
+          $.ajax({
+            url: "http://localhost/php/inventory/api/inventoryApi.php",
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                alert(msg);
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function update_check_data(){
+          var pass0 = {};
+          pass0.op   = "updateCheckData";
+          pass0.comp_id       = "1284";
+          pass0.c_house       = "01";
+          pass0.user = "1"
+          pass0.check_id  = 3; //更新盤點數量 by 盤點異動檔 的序號
+          pass0.check_qty  = 20; // 盤點數量
+
+          $.ajax({
+            url: "http://localhost/php/inventory/api/inventoryApi.php",
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                alert(msg);
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function list_check_data(){
+          var pass0 = {};
+          pass0.op   = "listCheckData";
+          pass0.comp_id       = "1284";
+          pass0.c_house       = "01";
+          pass0.user = "1"
+
+
+          $.ajax({
+            url: "http://localhost/php/inventory/api/inventoryApi.php",
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                if(msg=="OK"){
+                  product= data1["responseArray"];
+                  $.each(product, function(key, value) {
+                    if ( value["c_descrp"] == null ){
+                      console.log(value["barcode"] + ":品名不存在");
+                    } else {
+                      console.log(value["barcode"] + ":" + value["c_descrp"]);
+                    }
+                  });
+                }
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
     </script>
 </body>
 
