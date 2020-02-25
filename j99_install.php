@@ -96,11 +96,13 @@ function create_table($tablePrefix = "")
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
     `comp_id`    char(20)      NOT NULL COMMENT '公司別',
     `c_house`    char(20)      NOT NULL COMMENT '倉庫別',
-    `check_date` char(20)      NOT NULL COMMENT '盤點日期',
+    `check_date` datetime      NOT NULL COMMENT '盤點日期',
     `c_partno`   varchar(255)  NOT NULL COMMENT '產品編號',
     `barcode`    char(20)      NOT NULL COMMENT '絛碼編號',
     `c_descrp`   varchar(255)  NOT NULL COMMENT '產品名稱',
     `c_unit`     char(10)      NOT NULL COMMENT '單位',
+    `c_type`     char(100)     NOT NULL COMMENT '類別',
+    `c_brand`    char(100)     NOT NULL COMMENT '廠牌',
     `c_qtyst`    mediumint(7)           COMMENT '現有庫存',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
@@ -110,11 +112,12 @@ function create_table($tablePrefix = "")
     `id`         int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
     `comp_id`    char(20)      NOT NULL COMMENT '公司別',
     `c_house`    char(20)      NOT NULL COMMENT '倉庫別',
-    `check_date` char(20)      NOT NULL COMMENT '盤點日期',
+    `check_date` datetime      NOT NULL COMMENT '盤點日期',
     `check_user` char(20)      NOT NULL COMMENT '盤點人員',
-    `c_partno`   varchar(255)  NOT NULL COMMENT '產品編號',
-    `barcode`    char(20)      NOT NULL COMMENT '絛碼編號',
-    `check_qty`  mediumint(7)           COMMENT '盤點數量',
+    `c_partno`   varchar(255)   COMMENT '產品編號',
+    `barcode`    char(20)       COMMENT '絛碼編號',
+    `check_qty`  mediumint(7)   COMMENT '盤點數量',
+    `c_note`     varchar(255)   COMMENT '備註',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     $db->tableOperation($sql);
@@ -123,9 +126,9 @@ function create_table($tablePrefix = "")
       `id` mediumint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
       `comp_id`    char(20)      NOT NULL COMMENT '公司別',
       `c_type`     char(20)      NOT NULL COMMENT '資料類別',
-      `c_desc1`    char(20)      NOT NULL COMMENT '說明一',
-      `c_desc2`    char(20)      NOT NULL COMMENT '說明二',
-      `c_note`     varchar(255)  NOT NULL COMMENT '備註',
+      `c_desc1`    char(20)      COMMENT '說明一',
+      `c_desc2`    char(20)      COMMENT '說明二',
+      `c_note`     varchar(255)  COMMENT '備註',
       PRIMARY KEY (`id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
       $db->tableOperation($sql);
