@@ -126,6 +126,7 @@ function create_table($tablePrefix = "")
       `id` mediumint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
       `comp_id`    char(20)      NOT NULL COMMENT '公司別',
       `c_type`     char(20)      NOT NULL COMMENT '資料類別',
+      `c_code`     char(20)      NOT NULL COMMENT '代碼',
       `c_desc1`    char(20)      COMMENT '說明一',
       `c_desc2`    char(20)      COMMENT '說明二',
       `c_note`     varchar(255)  COMMENT '備註',
