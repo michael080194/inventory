@@ -22,7 +22,7 @@ include_once("layouts/_head.php");
 
 <div class="container">
 	<div class="row">
-		<div class="col min-vh-100 d-flex flex-column justify-content-center">
+		<div class="col min-vh-100 d-flex flex-column justify-content-center" style="margin: -60px 0; padding: 60px 0;">
 			<div class="row px-3">
 				<div class="w-100 mx-auto" style="max-width: 360px">
 					<div class="card-top-style"></div>
