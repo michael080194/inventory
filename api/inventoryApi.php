@@ -2,6 +2,7 @@
 // 盤點系統 與手機溝通之 API
 header('Access-Control-Allow-Origin: *'); //
 header("Content-Type:text/plain; charset=utf-8"); // text/html
+session_start();
 require_once "../php/config.php";
 require_once '../include/kyc_db.php';
 
@@ -69,6 +70,9 @@ function login_check_user($comp_id = "", $user = "", $pass = "")
     }
 
     if (password_verify($pass, $passHash)) {
+        $_SESSION["user"]     = $user;
+        $_SESSION["pass"]     = $pass;
+        $_SESSION["comp_id"]  = $comp_id;
         return "OK";
     } else {
         return "FAIL";

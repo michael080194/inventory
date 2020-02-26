@@ -1,5 +1,9 @@
 <?php
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (isset($_SESSION['user'])) {
 	header("location: index.php");
 }
@@ -76,7 +80,7 @@ include_once("layouts/_head.php");
 	</div>
 </div>
 
-<?php include("layouts/js.php") ?>
+<?php include_once("layouts/js.php") ?>
 
 <!-- Custom form validations -->
 <script>
