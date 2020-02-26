@@ -1,0 +1,23 @@
+:root {
+    --color: #00be68 !important;
+    --color-hover-dark: #00b260 !important;
+    --loader-dark: #99ba93;
+    --loader-dark-bg: rgba(0, 0, 0, .6);
+    --loader-dark-inner: #f7efd2;
+    --placeholder: #999 !important;
+}
+
+body {
+    background-color: #f6f6f6;
+    font-family: "STHeiti", sans-serif;
+}
+
+.btn.btn-main {
+    background-color: var(--color);
+    color: #fff;
+}
+
+.btn.btn-main:hover {
+    background-color: var(--color-hover-dark);
+    color: #fff;
+}
