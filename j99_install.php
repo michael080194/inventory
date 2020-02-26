@@ -46,10 +46,10 @@ function gen_table($tablePrefix)
     global $db, $WEB;
     mk_dir($web_path . "/uploads");
     // $tablePrefix = $WEB['prefix'];
-    $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
-    $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_stock");
-    $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_check");
-    $db->tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_system");
+    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
+    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_stock");
+    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_check");
+    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_system");
 
     create_table($tablePrefix);
 
@@ -90,7 +90,7 @@ function create_table($tablePrefix = "")
       `big_enable`  enum('0','1') default '0'  COMMENT '手機啟用',
       PRIMARY KEY (`id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    $db->tableOperation($sql);
+    $db->kyc_tableOperation($sql);
 
     $sql = "CREATE TABLE `{$tablePrefix}_inv_stock` (
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
@@ -106,7 +106,7 @@ function create_table($tablePrefix = "")
     `c_qtyst`    mediumint(7)           COMMENT '現有庫存',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    $db->tableOperation($sql);
+    $db->kyc_tableOperation($sql);
 
     $sql = "CREATE TABLE `{$tablePrefix}_inv_check` (
     `id`         int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
@@ -120,7 +120,7 @@ function create_table($tablePrefix = "")
     `c_note`     varchar(255)   COMMENT '備註',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    $db->tableOperation($sql);
+    $db->kyc_tableOperation($sql);
 
     $sql = "CREATE TABLE `{$tablePrefix}_inv_system` (
       `id` mediumint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
@@ -132,7 +132,7 @@ function create_table($tablePrefix = "")
       `c_note`     varchar(255)  COMMENT '備註',
       PRIMARY KEY (`id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-      $db->tableOperation($sql);
+      $db->kyc_tableOperation($sql);
 
     return true;
 }

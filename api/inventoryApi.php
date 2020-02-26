@@ -6,7 +6,7 @@ session_start();
 require_once "../php/config.php";
 require_once '../include/kyc_db.php';
 
-$db = new db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
+$db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 
 $op = $_POST["op"]; // 操作對象
 switch ($op) {
@@ -30,11 +30,6 @@ switch ($op) {
         $r['responseStatus'] = "FAIL";
         echo json_encode($r, JSON_UNESCAPED_UNICODE);
         break;
-}
-#####################################################################################
-function kyc_security($str1)
-{
-    return addslashes($str1);
 }
 ################################
 # 使用者登錄檢查
@@ -60,10 +55,12 @@ function login_check_user($comp_id = "", $user = "", $pass = "")
     if (!$comp_id or !$user or !$pass) {
         return "FAIL";
     }
+
     $tbl             = $comp_id . "_inv_user";
     $searchCondition = "`comp_id` = '{$comp_id}' AND `user` = '{$user}' ";
     $sql             = "SELECT * FROM `$tbl` WHERE " . $searchCondition;
-    $result          = $db->sqlFetch_assoc($sql);
+
+    $result          = $db->kyc_sqlFetch_assoc($sql);
     $passHash        = "";
     foreach ($result as $item) {
         $passHash = $item['pass'];
@@ -103,7 +100,7 @@ function insertByBarcode()
     $tbl             = $comp_id . "_inv_stock"; // 現有庫存檔
     $searchCondition = "`comp_id` = '{$comp_id}' AND `c_house` = '{$c_house}' AND `barcode` = '{$barcode}' ";
     $sql             = "SELECT * FROM `$tbl` WHERE " . $searchCondition;
-    $result          = $db->sqlFetch_assoc($sql);
+    $result          = $db->kyc_sqlFetch_assoc($sql);
 
     $r   = array();
     $all = array();
@@ -132,7 +129,7 @@ function insertByBarcode()
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
     $sqlArr['barcode']    = $barcode;    // 條碼
     $sqlArr['check_qty']  = $c_qty;      // 盤點人員
-    $insert_id = $db->insert($tbl, $sqlArr); // 取得新增資料的 id 值
+    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
 
     $all["insert_id"] = $insert_id;
     $r['responseStatus']  = "OK";
@@ -166,7 +163,7 @@ function updateCheckData()
     $sqlArr         = array();
     $sqlArr['check_qty'] = $check_qty;
 
-    $db->sqlUpdate($tbl, $sqlArr, $updateCondition);
+    $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
 
     $r['responseStatus']  = "OK";
     $r['responseMessage'] = "";
@@ -194,7 +191,7 @@ function deleteCheckData()
     $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
     $deleteCondition .= "check_user = '{$user}' AND id= '{$check_id}' ";
 
-    $db->sqlDelete($tbl, $deleteCondition);
+    $db->kyc_sqlDelete($tbl, $deleteCondition);
 
     $r['responseStatus']  = "OK";
     $r['responseMessage'] = "";
@@ -222,7 +219,7 @@ function listCheckData()
 
     $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition;
 
-    $result          = $db->sqlFetch_assoc($sql);
+    $result          = $db->kyc_sqlFetch_assoc($sql);
     $r   = array();
     $all = array();
     foreach ($result as $prods) {

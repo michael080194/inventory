@@ -31,7 +31,7 @@ $WEB['prefix'] = "001";
 #--------- WEB END -----
 
 //連線資料庫
-$db = new db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
+$db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 
 #判斷是否登入
 $_SESSION['isUser']  = isset($_SESSION['isUser']) ? $_SESSION['isUser'] : false;

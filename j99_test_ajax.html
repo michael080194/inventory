@@ -67,9 +67,9 @@
         $(document).ready(function () {
           // test_login(); // 測試 login
           // test_insertByBarcode(); // 用 barcode 抓取產品資料 並 新增資料至 盤點異動檔
-          delete_check_data(); // delete data by 盤點異動檔 的序號
           // update_check_data(); // 更新盤點數量 by 盤點異動檔 的序號
-          // list_check_data(); // 顯示 盤點異動檔 資料
+          // delete_check_data(); // delete data by 盤點異動檔 的序號
+          list_check_data(); // 顯示 盤點異動檔 資料
         });
         function test_login(){
           var pass0 = {};
@@ -179,7 +179,7 @@
           pass0.comp_id       = "1284";
           pass0.c_house       = "01";
           pass0.user = "1"
-          pass0.check_id  = 3; //更新盤點數量 by 盤點異動檔 的序號
+          pass0.check_id  = 2; //更新盤點數量 by 盤點異動檔 的序號
           pass0.check_qty  = 20; // 盤點數量
 
           $.ajax({

@@ -49,10 +49,10 @@ function insert1()
     // $return_id = $db->insert($tbl, $sqlArr);
 
     if ($save_type == "ADD") {
-        $return_id = $db->sqlReplace($tbl, $sqlArr, "ADD");
+        $return_id = $db->kyc_sqlReplace($tbl, $sqlArr, "ADD");
     } else {
         $sqlArr['id'] = 3;
-        $db->sqlReplace($tbl, $sqlArr, "UPDATE");
+        $db->kyc_sqlReplace($tbl, $sqlArr, "UPDATE");
     }
 
     return true;
@@ -71,10 +71,10 @@ function update1()
     $sqlArr['user'] = "michaelYY";
     $sqlArr['name'] = "CHANGYY";
 
-    $user            = "michael";
-    $name            = "CHANG";
+    $user            = "1";
+    $name            = "michael";
     $updateCondition = "user = '{$user}'  AND name= '{$name}'";
-    $return_id       = $db->sqlUpdate($tbl, $sqlArr, $updateCondition);
+    $return_id       = $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
 
     return true;
 }
@@ -88,10 +88,10 @@ function delete1()
 
     $tbl = "1284_inv_user"; //die($sql);
 
-    $user            = "michael";
-    $id              = 6;
+    $user            = "michaelYY";
+    $id              = 3;
     $deleteCondition = "user = '{$user}'  AND id= '{$id}'";
-    $return_id       = $db->sqlDelete($tbl, $deleteCondition);
+    $return_id       = $db->kyc_sqlDelete($tbl, $deleteCondition);
 
     return true;
 }
@@ -108,7 +108,7 @@ function gen_data()
     $sqlArr['name']  = "michael";
     $sqlArr['pass']  = password_hash("1", PASSWORD_DEFAULT);
     $sqlArr['email'] = "michael@gmail.com";
-    $return_id = $db->insert($tbl, $sqlArr);
+    $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     $sqlArr          = array();
     $sqlArr['comp_id']  = "1284";
@@ -116,7 +116,7 @@ function gen_data()
     $sqlArr['name']  = "may";
     $sqlArr['pass']  = password_hash("2", PASSWORD_DEFAULT);
     $sqlArr['email'] = "may@gmail.com";
-    $return_id = $db->insert($tbl, $sqlArr);
+    $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     $tbl       = "1284_inv_stock";
     $sqlArr          = array();
@@ -128,7 +128,7 @@ function gen_data()
     $sqlArr['c_descrp']  = "國際牌電視機";
     $sqlArr['c_unit'] = "台";
     $sqlArr['c_qtyst'] = 10.5;
-    $return_id = $db->insert($tbl, $sqlArr);
+    $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     $sqlArr          = array();
     $sqlArr['comp_id']  = "1284";
@@ -139,7 +139,7 @@ function gen_data()
     $sqlArr['c_descrp']  = "日立牌冷氣機";
     $sqlArr['c_unit'] = "台";
     $sqlArr['c_qtyst'] = 5123456;
-    $return_id = $db->insert($tbl, $sqlArr);
+    $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     return true;
 }
