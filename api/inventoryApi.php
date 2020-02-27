@@ -3,8 +3,8 @@
 header('Access-Control-Allow-Origin: *'); //
 header("Content-Type:text/plain; charset=utf-8"); // text/html
 session_start();
-require_once "../php/config.php";
-require_once '../include/kyc_db.php';
+require_once "../dist/php/config.php";
+require_once '../dist/nclude/kyc_db.php';
 
 $db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 

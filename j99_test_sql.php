@@ -1,5 +1,5 @@
 ﻿<?php
-require_once "php/header.php";
+require_once "dist/php/header.php";
 
 $result = "";
 if (isset($_POST['submit'])) {

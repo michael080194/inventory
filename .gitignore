@@ -1,2 +1,3 @@
-php/config.php
-uploads/
+dist/php/config.php
+dist/uploads/
+smarty/
