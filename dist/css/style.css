@@ -22,3 +22,56 @@ body {
     background-color: var(--color-hover-dark);
     color: #fff;
 }
+
+.custom-file-input {
+    cursor: pointer;
+}
+
+.custom-file-input~.custom-file-label::after {
+    content: '瀏覽';
+}
+
+.custom-file-label {
+    /* color: var(--placeholder); */
+    letter-spacing: 1px;
+}
+
+form.needs-validation .form-control::-webkit-input-placeholder {
+    /* WebKit, Blink, Edge */
+    color: var(--placeholder);
+    letter-spacing: 1px;
+}
+
+form.needs-validation .form-control:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: var(--placeholder);
+    letter-spacing: 1px;
+}
+
+form.needs-validation .form-control::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: var(--placeholder);
+    letter-spacing: 1px;
+}
+
+form.needs-validation .form-control:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: var(--placeholder);
+    letter-spacing: 1px;
+}
+
+form.needs-validation .form-control::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: var(--placeholder);
+    letter-spacing: 1px;
+}
+
+form.needs-validation input {
+    letter-spacing: 1px;
+}
+
+form.needs-validation input:focus,
+.custom-file-input:focus~.custom-file-label {
+    border-color: var(--color);
+    box-shadow: 0 0 0 .2rem rgba(40, 167, 69, .25);
+}

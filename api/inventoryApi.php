@@ -66,14 +66,17 @@ function login_check_user($comp_id = "", $user = "", $pass = "")
 
     $result          = $db->kyc_sqlFetch_assoc($sql);
     $passHash        = "";
+    $is_admin         = false;
     foreach ($result as $item) {
         $passHash = $item['pass'];
+        $is_admin = ($item['isAdmin']) ? true : false;
     }
 
     if (password_verify($pass, $passHash)) {
         $_SESSION["user"]     = $user;
         $_SESSION["pass"]     = $pass;
         $_SESSION["comp_id"]  = $comp_id;
+        $_SESSION["is_admin"]  = $is_admin;
         return "OK";
     } else {
         return "FAIL";
@@ -86,7 +89,7 @@ function logout()
 {
     session_destroy();
     $_SESSION = array();
-    
+
     $r            = array();
     $r['responseStatus']     = "OK";
     return json_encode($r, JSON_UNESCAPED_UNICODE);

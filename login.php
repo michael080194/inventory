@@ -9,15 +9,11 @@ if (isset($_SESSION['user'])) {
 
 include_once("dist/layouts/_head.php");
 
+include_once("dist/layouts/loader.php");
+
 ?>
 
 <link rel="stylesheet" href="dist/css/login.css">
-
-<div class="loader">
-	<div class="loader-border">
-		<span class="loader-inner"></span>
-	</div>
-</div>
 
 <div class="container">
 	<div class="row">
@@ -107,8 +103,7 @@ include_once("dist/layouts/_head.php");
 
 	function kyc_login_function() {
 		let loginForm = $('.login-form');
-		var url1 = "http://localhost/inventory/api/inventoryApi.php";
-		// var url1 = "http://michael1.cp35.secserverpros.com/inventory/api/inventoryApi.php";
+		var url1 = "/inventory/api/inventoryApi.php";
 		var pass0 = {};
 		pass0.op = 'login';
 		pass0.comp_id = loginForm.find('input[name="company_id"]').val();
