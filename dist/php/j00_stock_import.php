@@ -54,8 +54,6 @@ $smartyTpl->display($theme);
 function stock_import($_post, $_files) {
     global $_KYC_URL_ROOT, $_KYC_DOCUMENT_ROOT, $db, $smartyTpl;
 
-    $r = array();
-
     if (!empty($_files["excel_file"])) {
         $comp_id = $_SESSION["comp_id"];
         $c_house = $_post["c_house"];
@@ -122,56 +120,19 @@ function stock_import($_post, $_files) {
                 $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
             }
 
-            // // Demo only
-            // echo "<table border=1>
-            //     <tr>
-            //         <th>公司別</th>
-            //         <th>倉庫別</th>
-            //         <th>盤點日期</th>
-            //         <th>產品編號</th>
-            //         <th>條碼編號</th>
-            //         <th>產品名稱</th>
-            //         <th>單位</th>
-            //         <th>類別</th>
-            //         <th>廠牌</th>
-            //         <th>現有庫存</th>
-            //     </tr>
-            // ";
-            // for ($i = 1; $i < $data_stock_length; $i++) {
-            //     $c_partno = $data_stock[$i][0]; // 產品編號 (機型)
-            //     $barcode  = $data_stock[$i][1]; // 條碼編號
-            //     $c_descrp = $data_stock[$i][2]; // 產品名稱
-            //     $c_qtyst  = $data_stock[$i][3]; // 現有庫存
-            //     $c_unit   = $data_stock[$i][4]; // 單位
-            //     $c_brand  = $data_stock[$i][5]; // 廠牌
-            //     $c_type   = $data_stock[$i][6]; // 類別
-            //     echo "<tr>";
-            //     echo "<td>$comp_id</td>";    // 公司別
-            //     echo "<td>$c_house</td>";    // 倉庫別
-            //     echo "<td>$check_date</td>"; // 盤點日期
-            //     echo "<td>$c_partno</td>";   // 產品編號
-            //     echo "<td>$barcode</td>";    // 條碼編號
-            //     echo "<td>$c_descrp</td>";   // 產品名稱
-            //     echo "<td>$c_unit</td>";     // 單位
-            //     echo "<td>$c_type</td>";     // 類別
-            //     echo "<td>$c_brand</td>";    // 廠牌
-            //     echo "<td>$c_qtyst</td>";    // 現有庫存
-            //     echo "</tr>";
-            // }
-            // echo "</table>";
-
-            $r["responseStatus"] = "OK";
-            $r["responseMessage"] = "資料匯入成功！";
+            $alertCss = "alert-success";
+            $msg = "資料匯入成功！";
         }
         else {
-            $r["responseStatus"]  = "FAIL";
-            $r["responseMessage"] = "檔案格式出錯，請上傳 csv, xls, xlsx 格式的檔案。";
+            $alertCss  = "alert-danger";
+            $msg = "檔案格式出錯，請上傳 csv, xls, xlsx 格式的檔案。";
         }
     }
     else {
-        $r["responseStatus"]  = "FAIL";
-        $r["responseMessage"] = "沒有接收到檔案，請重新操作一次。";
+        $alertCss  = "alert-danger";
+        $msg = "沒有接收到檔案，請重新操作一次。";
     }
 
-    $smartyTpl->assign("responseMessage", $r["responseMessage"]);
+    $smartyTpl->assign("responseCss", "$alertCss d-block");
+    $smartyTpl->assign("responseMessage", $msg);
 }

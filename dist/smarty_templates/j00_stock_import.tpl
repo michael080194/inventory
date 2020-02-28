@@ -57,7 +57,7 @@
             <div class="invalid-feedback">請選擇檔案</div>
         </div>
 
-        <div class="alert alert-text" style="display: none;" role="alert">
+        <div class="alert alert-text <{$responseCss}>" role="alert">
             <{$responseMessage}>
         </div>
 
