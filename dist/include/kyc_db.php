@@ -120,12 +120,18 @@ if (!class_exists('KYC_DB')) {
         {
             $db     = $this->kyc_connect();
             $result = $db->query($query);
-            $results = array();
-            while ($row = $result->fetch_assoc()) {
-                $results[] = $row;
-            }
 
-            return $results;
+            // if no any $row, $result == false, then return false
+            if ($result) {
+                $results = array();
+                while ($row = $result->fetch_assoc()) {
+                    $results[] = $row;
+                }
+                return $results;
+            }
+            else {
+                return false;
+            }
         }
 
         public function kyc_sqlFetch_row($query)

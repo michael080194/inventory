@@ -64,7 +64,7 @@ include_once("dist/layouts/loader.php");
 										</div>
 									</div>
 								</div>
-								<div class="alert-text text-danger" style="display: none;" role="alert"></div>
+								<div class="alert-text text-danger" role="alert"></div>
 								<button type="submit" class="btn btn-main btn-lg w-100 mt-3">登入</button>
 							</form>
 						</div>
