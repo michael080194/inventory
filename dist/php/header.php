@@ -1,22 +1,22 @@
 <?php
+// if (session_status() == PHP_SESSION_NONE) {
+// 	session_start();
+// }
+$_DOCUMENT_ROOT = realpath($_SERVER["DOCUMENT_ROOT"]) . "/inventory";
+// $_DOCUMENT_ROOT = str_replace("/dist","",$_DOCUMENT_ROOT);
+// echo $_DOCUMENT_ROOT;
+// die();
+// $_DOCUMENT_ROOT = dirname(__DIR__);
+// $_DOCUMENT_ROOT = realpath($_SERVER["DOCUMENT_ROOT"]);
 
-$_DOCUMENT_ROOT = dirname(__DIR__);
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
 require_once "config.php";
+require_once "kyc_cm_fun.php";
 require_once "$_DOCUMENT_ROOT/dist/include/kyc_db.php";
-require_once  "$_DOCUMENT_ROOT/smarty/libs/Smarty.class.php ";
+require_once  "$_DOCUMENT_ROOT/smarty/libs/Smarty.class.php";
+
 error_reporting(E_ALL);@ini_set('display_errors', true); //設定所有錯誤都顯示
-
-#網站實體路徑(不含 /)  Users/michaelchang/Documents/michael/php/ele
-define('ROOT_PATH', str_replace("\\", "/", dirname(__FILE__)));
-
-#$_SERVER["DOCUMENT_ROOT"] ==> /Users/michaelchang/Documents/michael/php
-#網站URL(不含 /) http://localhost/ele
-// define('XOOPS_URL', $http . $_SERVER["HTTP_HOST"] . str_replace($_SERVER["DOCUMENT_ROOT"], "", XOOPS_ROOT_PATH));
-// define('XOOPS_URL', kyc_get_url());
+$_KYC_ROOT_PATH = "/inventory";
 #--------- WEB -----
 #程式檔名(含副檔名)
 $WEB['file_name'] = basename($_SERVER['PHP_SELF']); //index.php
@@ -44,3 +44,10 @@ $_SESSION['isUser']  = isset($_SESSION['isUser']) ? $_SESSION['isUser'] : false;
 $_SESSION['isAdmin'] = isset($_SESSION['isAdmin']) ? $_SESSION['isAdmin'] : false;
 $smartyTpl->assign("isUser", $_SESSION['isUser']);
 $smartyTpl->assign("isAdmin", $_SESSION['isAdmin']);
+
+define("_EVERY_PAGE", 10);
+define("_EVERY_TOOLBAR", 20);
+
+$op     = isset($_REQUEST['op']) ? htmlspecialchars($_REQUEST['op'], ENT_QUOTES) : '';
+$g2p = isset($_REQUEST['g2p']) ? intval($_REQUEST['g2p']) : 1; // 查詢時頁次控制
+$error = $content = '';

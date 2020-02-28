@@ -13,10 +13,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">資料匯入</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="dist/php/j00_user.php">使用者建立</a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="btn btn-outline-light" href="#"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                    <a class="btn btn-outline-light" onclick="kyc_logout()"><i class="fas fa-sign-out-alt"></i> 登出</a>
                 </li>
             </ul>
         </div>

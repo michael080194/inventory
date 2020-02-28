@@ -4,7 +4,8 @@ header('Access-Control-Allow-Origin: *'); //
 header("Content-Type:text/plain; charset=utf-8"); // text/html
 session_start();
 require_once "../dist/php/config.php";
-require_once '../dist/nclude/kyc_db.php';
+require_once "../dist/php/kyc_cm_fun.php";
+require_once '../dist/include/kyc_db.php';
 
 $db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 
@@ -12,6 +13,9 @@ $op = $_POST["op"]; // 操作對象
 switch ($op) {
     case 'login':
         echo login();
+        break;
+    case 'logout':
+        echo logout();
         break;
     case 'insertByBarcode':
         echo insertByBarcode();
@@ -74,6 +78,18 @@ function login_check_user($comp_id = "", $user = "", $pass = "")
     } else {
         return "FAIL";
     }
+}
+################################
+# 使用者登出
+#################################
+function logout()
+{
+    session_destroy();
+    $_SESSION = array();
+    
+    $r            = array();
+    $r['responseStatus']     = "OK";
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ################################
 # 盤點人員掃條碼後將資料送雲端
@@ -231,14 +247,14 @@ function listCheckData()
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
-########################################################################
-#  產生訊息檔,以供 debug
-########################################################################
-function genMsgFile($fileName = "msg", $fileType = "txt", $msgText = "")
-{
-    // genMsgFile("001_", "txt", "AAAA");
-    $file = "../uploads/" . $fileName . "_" . strtotime("now") . "." . $fileType;
-    $f    = fopen($file, 'w'); //以寫入方式開啟文件
-    fwrite($f, $msgText); //將新的資料寫入到原始的文件中
-    fclose($f);
-}
+// ########################################################################
+// #  產生訊息檔,以供 debug
+// ########################################################################
+// function genMsgFile($fileName = "msg", $fileType = "txt", $msgText = "")
+// {
+//     // genMsgFile("001_", "txt", "AAAA");
+//     $file = "../dist/uploads/" . $fileName . "_" . strtotime("now") . "." . $fileType;
+//     $f    = fopen($file, 'w'); //以寫入方式開啟文件
+//     fwrite($f, $msgText); //將新的資料寫入到原始的文件中
+//     fclose($f);
+// }

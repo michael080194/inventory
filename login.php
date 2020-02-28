@@ -1,5 +1,4 @@
 <?php
-
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,11 +7,11 @@ if (isset($_SESSION['user'])) {
 	header("location: index.php");
 }
 
-include_once("layouts/_head.php");
+include_once("dist/layouts/_head.php");
 
 ?>
 
-<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="dist/css/login.css">
 
 <div class="loader">
 	<div class="loader-border">
@@ -35,7 +34,7 @@ include_once("layouts/_head.php");
 							雲端盤點系統登入
 						</h3>
 						<div class="card-body p-0">
-							<form class="login-form needs-validation" method="POST" autocomplete="off" novalidate onsubmit="return kyc_login_function();">
+							<form class="login-form needs-validation" method="POST" autocomplete="off" novalidate>
 								<div class="form-group">
 									<div class="form-row align-items-center flex-nowrap mx-0">
 										<div class="icon-area">
@@ -69,7 +68,7 @@ include_once("layouts/_head.php");
 										</div>
 									</div>
 								</div>
-								<div class="alert-text text-danger" style="display: none;" role="alert">* </div>
+								<div class="alert-text text-danger" style="display: none;" role="alert"></div>
 								<button type="submit" class="btn btn-main btn-lg w-100 mt-3">登入</button>
 							</form>
 						</div>
@@ -80,7 +79,7 @@ include_once("layouts/_head.php");
 	</div>
 </div>
 
-<?php include_once("layouts/js.php") ?>
+<?php include_once("dist/layouts/js.php") ?>
 
 <!-- Custom form validations -->
 <script>
@@ -96,6 +95,10 @@ include_once("layouts/_head.php");
 						event.preventDefault();
 						event.stopPropagation();
 					}
+					else {
+						kyc_login_function();
+						event.preventDefault();
+					}
 					form.classList.add('was-validated');
 				}, false);
 			});
@@ -104,15 +107,16 @@ include_once("layouts/_head.php");
 
 	function kyc_login_function() {
 		let loginForm = $('.login-form');
-
+		var url1 = "http://localhost/inventory/api/inventoryApi.php";
+		// var url1 = "http://michael1.cp35.secserverpros.com/inventory/api/inventoryApi.php";
 		var pass0 = {};
 		pass0.op = 'login';
 		pass0.comp_id = loginForm.find('input[name="company_id"]').val();
 		pass0.user = loginForm.find('input[name="user"]').val();
 		pass0.pass = loginForm.find('input[name="pass"]').val();
-
 		$.ajax({
-			url: 'http://localhost/php/inventory/api/inventoryApi.php',
+			// url: 'http://localhost/php/inventory/api/inventoryApi.php',
+			url: url1,
 			method: 'POST',
 			data: pass0,
 			beforeSend: function (xhr) {
@@ -121,20 +125,20 @@ include_once("layouts/_head.php");
 			complete: function (xhr, status) {
 				$('.loader').css('display', 'none');
 			},
-			success: function (data, xhr, status) {
-				var data1 = JSON.parse(data);
-				msg = data1['responseStatus']; // if SUCCESS return content array
-				if (msg == 'OK') { // login SUCCESS
-					location.href = 'index.php';
+			success: function (response, xhr, status) {
+				response = JSON.parse(response);
+				status = response['responseStatus']; // if SUCCESS return content array
+				if (status == 'OK') { // login SUCCESS
+					location.href = 'dist/php/index_1.php';
 				} else {
-					$('.alert-text').append('帳號或密碼錯誤。');
+					$('.alert-text').text('* 帳號或密碼錯誤。');
 					$('.alert-text').show();
 				}
 			},
 			error: function (xhr, status) {
 				// `status` will return 'error'
 				console.log('xhr: ', xhr);
-				$('.alert-text').append('系統出現非預期錯誤，請聯絡負責人員。');
+				$('.alert-text').text('* 系統出現非預期錯誤，請聯絡負責人員。');
 				$('.alert-text').show();
 			}
 		});
@@ -143,4 +147,4 @@ include_once("layouts/_head.php");
 	}
 </script>
 
-<?php include_once("layouts/_foot.php") ?>
+<?php include_once("dist/layouts/_foot.php") ?>

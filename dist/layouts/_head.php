@@ -12,8 +12,8 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
 	<!-- Custom style -->
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/loader.css">
+	<link rel="stylesheet" href="/inventory/dist/css/style.css">
+	<link rel="stylesheet" href="/inventory/dist/css/loader.css">
 </head>
 
 <body>

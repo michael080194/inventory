@@ -85,7 +85,7 @@ function create_table($tablePrefix = "")
       `pass`    varchar(255)  NOT NULL COMMENT '使用者密碼',
       `name`    varchar(255)  NOT NULL COMMENT '使用者姓名',
       `email`   varchar(255)           COMMENT '使用者Email',
-      `group`   varchar(255)           COMMENT '群組',
+      `isAdmin`  enum('0','1') default '0'  COMMENT '1:代表此使用者為管理者',
       `big_serial`   varchar(255)      COMMENT '手機序號',
       `big_enable`  enum('0','1') default '0'  COMMENT '手機啟用',
       PRIMARY KEY (`id`)

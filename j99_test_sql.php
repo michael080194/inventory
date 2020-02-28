@@ -108,6 +108,7 @@ function gen_data()
     $sqlArr['name']  = "michael";
     $sqlArr['pass']  = password_hash("1", PASSWORD_DEFAULT);
     $sqlArr['email'] = "michael@gmail.com";
+    $sqlArr['isAdmin'] = 1;
     $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     $sqlArr          = array();
@@ -116,6 +117,7 @@ function gen_data()
     $sqlArr['name']  = "may";
     $sqlArr['pass']  = password_hash("2", PASSWORD_DEFAULT);
     $sqlArr['email'] = "may@gmail.com";
+    $sqlArr['isAdmin'] = 0;
     $return_id = $db->kyc_insert($tbl, $sqlArr);
 
     $tbl       = "1284_inv_stock";

@@ -2,32 +2,12 @@
 if (session_status() == PHP_SESSION_NONE) {
 	session_start();
 }
+require_once "dist/php/header.php";
 
 if (!isset($_SESSION["user"])) {
-	header("location: login.php");
+	header("location: $_KYC_ROOT_PATH/login.php");
+} else {
+    header("location: $_KYC_ROOT_PATH/dist/php/index_1.php");
 }
-
-include_once("layouts/_head.php");
-
-?>
-
-<link rel="stylesheet" href="css/login.css">
-
-<div class="loader">
-	<div class="loader-border">
-		<span class="loader-inner"></span>
-	</div>
-</div>
-<?php include_once("layouts/navbar.php"); ?>
-<div class="container">
-
-</div>
-
-<?php include_once("layouts/js.php") ?>
-
-<!-- Custom form validations -->
-<script>
-
-</script>
-
-<?php include_once("layouts/_foot.php") ?>
+// header("location: " . KYC_URL ."/dist/php/index_1.php");
+// header("location:dist/php/index_1.php");
