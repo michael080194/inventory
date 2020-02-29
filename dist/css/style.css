@@ -13,6 +13,10 @@ body {
     font-family: "STHeiti", sans-serif;
 }
 
+.alert-text {
+    display: none;
+}
+
 .btn.btn-main {
     background-color: var(--color);
     color: #fff;

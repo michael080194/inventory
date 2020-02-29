@@ -1,5 +1,4 @@
 <?php
-
 require_once "index_check.php";
 require_once "header.php";
 try

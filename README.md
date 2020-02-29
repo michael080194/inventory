@@ -25,8 +25,9 @@
     *   [產生 cordova 專案](#cordova)
 *   [PHP程式]
     *   [HTML+CSS](#HTML)
-    *   [Javascript template 7](#JQUERY)
+    *   [Javascript](#JQUERY)
     *   [PHP](#PHP)
+    *   [Smarty](#Smarty)
 *   [APP程式]
     *   [Cordova](#app-1)
     *   [Framework7 Vue](#app-2)

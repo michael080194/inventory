@@ -5,13 +5,6 @@ if (session_status() == PHP_SESSION_NONE) {
 
 require_once "header.php";
 
-var_dump($_KYC_DOCUMENT_ROOT);
-echo "<BR><BR>";
-var_dump($_KYC_URL_ROOT);
-echo "<BR><BR>";
-var_dump($_SESSION);
-echo "<BR><BR>";
-die();
 
 if (!isset($_SESSION["user"])) {
 	header("location: $_KYC_URL_ROOT/login.php");
@@ -29,6 +22,8 @@ try
             $theme = "j00_stock_import.tpl";
             break;
         default:
+            $smartyTpl->assign("responseCss", "");
+            $smartyTpl->assign("responseMessage", "");
             $theme = "j00_stock_import.tpl";
             break;
     }
@@ -40,13 +35,7 @@ try
 $page_title = "雲端行動盤點系統";
 // $theme = "index_1.tpl";
 
-$smartyTpl->assign('op', $op);
-$smartyTpl->assign('g2p', $g2p);
-$smartyTpl->assign('error', $error);
-$smartyTpl->assign('page_title', $page_title);
-$smartyTpl->assign('content', $content);
-$smartyTpl->display($theme);
-
+require_once "footer.php";
 #################################
 #
 # 使用者註冊表單

@@ -26,11 +26,11 @@
 
           <div class="navbar-collapse collapse" id="navbar-main">
               <ul class="navbar-nav mr-auto">
-                  <li class="nav-item active">
-                      <a class="nav-link" href="#">資料匯出 <span class="sr-only">(current)</span></a>
-                  </li>
                   <li class="nav-item">
                       <a class="nav-link" href="j00_stock_import.php">資料匯入</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="j00_stock_export.php">資料匯出</a>
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" href="j00_user.php">使用者建立</a>
