@@ -97,7 +97,6 @@
     })();
 
     function kyc_stock_import () {
-        alert("BBB");
         $.ajax({
             url: 'j00_stock_export.php',
             method: 'POST',
@@ -110,7 +109,6 @@
                 status = response['responseStatus'];
                 let msg = response['responseMessage'];
                 let cssAlertColor = 'alert-danger';
-                alert(status);
                 if (status == 'OK') {
 
                 }
@@ -118,7 +116,6 @@
                 $('.alert-text').show();
             },
             error: function(xhr, status) {
-                // `status` will return 'error'
                 console.log('xhr: ', xhr);
                 $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
                 $('.alert-text').show();
