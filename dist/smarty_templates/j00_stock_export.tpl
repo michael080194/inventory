@@ -21,11 +21,13 @@
     }
 </style>
 
+<{include file='loader.tpl' }>
+
 <div class="container">
     <h1 class="pt-4">匯出盤點明細表</h1>
     <hr>
-    <form action="j00_stock_export.php" method="post" enctype="multipart/form-data">
-    <!-- <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate> -->
+    <!-- <form action="j00_stock_export.php" method="post" enctype="multipart/form-data"> -->
+    <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate>
         <input type="hidden" name="op" value="stockExport">
 
         <div class="form-row">
@@ -50,13 +52,34 @@
             </div>
         </div>
 
+        <div class="alert alert-text" role="alert"></div>
 
         <div class="form-group">
             <button type="submit" class="btn btn-main mt-3">匯出</button>
         </div>
+
+        <table class="table table-striped" style="display: none">
+            <thead>
+                <tr>
+                    <th scope="col">機種編號</th>
+                    <th scope="col">條碼編號</th>
+                    <th scope="col">產品名稱</th>
+                    <th scope="col">單位</th>
+                    <th scope="col">現有庫存</th>
+                    <th scope="col">盤點條碼</th>
+                    <th scope="col">盤點數量</th>
+                    <th scope="col">差額</th>
+                    <th scope="col">盤點說明</th>
+                    <th scope="col">盤點人員</th>
+                    <th scope="col">註記</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div class="download-stock-file d-none"></div>
     </form>
-    <div id="result">
-    </div>
 </div>
 
 <{include file='footer.tpl' }>
@@ -87,8 +110,8 @@
                         event.preventDefault();
                         event.stopPropagation();
                     } else {
-                        kyc_stock_import();
                         event.preventDefault();
+                        kyc_stock_export();
                     }
                     form.classList.add('was-validated');
                 }, false);
@@ -96,30 +119,107 @@
         }, false);
     })();
 
-    function kyc_stock_import () {
-        $.ajax({
-            url: 'j00_stock_export.php',
-            method: 'POST',
-            data: new FormData(this),
-            contentType: false,
-            processData: false,
-            success: function(response, xhr, status) {
-                console.log(response);
-                response = JSON.parse(response);
-                status = response['responseStatus'];
-                let msg = response['responseMessage'];
-                let cssAlertColor = 'alert-danger';
-                if (status == 'OK') {
+    function kyc_stock_export() {
+		let form = $('#form-stock-excel');
+		var url1 = "/inventory/api/inventoryApi.php";
+		var pass0 = {};
+		pass0.op = form.find('input[name="op"]').val();
+		pass0.c_house = form.find('input[name="c_house"]').val();
+		pass0.check_date = form.find('input[name="check_date"]').val();
 
-                }
-                $('.alert-text').addClass(cssAlertColor).text(msg);
-                $('.alert-text').show();
+        $.ajax({
+            url: url1,
+            method: 'POST',
+            data: pass0,
+			beforeSend: function (xhr) {
+				$('.loader').css('display', 'flex');
+			},
+            success: function(response, xhr, status) {
+                setTimeout(function () {
+                    response = JSON.parse(response);
+                    let stockDataArray = response['responseResult'];
+                    let content = '';
+                    $.each(stockDataArray, function (index, stockDataRow) {
+                        content += '<tr>';
+                        $.each(stockDataRow, function (index, stockData) {
+                            content += '<td>' + stockData + '</td>';
+                        });
+                        content += '</td>';
+                    });
+                    $('table tbody').html(content);
+                    $('table').show();
+                    $('.loader').css('display', 'none');
+                    return;
+
+                    let cssAlertColor = 'alert-danger';
+                    let msg = '系統出現非預期錯誤，請聯絡負責人員。';
+                    if (response == '[]') {
+                        // 若成功產生盤點結果明細表，則自動下載後，刪除該檔案，再停止loader；
+                        form.find('button[type="submit"]').addClass('disabled');
+                        cssAlertColor = 'alert-success';
+                        msg = '匯出成功，等待下載......';
+                        kyc_stock_download_exported_data(pass0.c_house, pass0.check_date);
+                    }
+                    else {
+                        // 若失敗則直接停止loader
+                        $('.loader').css('display', 'none');
+                    }
+                    $('.alert-text').addClass(cssAlertColor).text(msg);
+                    $('.alert-text').show();
+                }, 1000);
             },
             error: function(xhr, status) {
-                console.log('xhr: ', xhr);
-                $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
-                $('.alert-text').show();
+                setTimeout(function () {
+                    // `status` will return 'error'
+                    console.log('xhr: ', xhr);
+                    $('.loader').css('display', 'none');
+                    $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
+                    $('.alert-text').show();
+                }, 1000);
             }
         });
+    }
+
+    function kyc_stock_download_exported_data(c_house, check_date) {
+        let filename = `${check_date}_${c_house}_盤點結果明細表.csv`;
+        setTimeout(function () {
+            let link = document.createElement('a');
+            link.href = filename;
+            link.download = filename;
+            document.querySelector('.download-stock-file').appendChild(link);
+            link.click();
+
+            var url1 = "/inventory/api/inventoryApi.php";
+            var pass0 = {};
+            pass0.op = 'stockExportFileDelete';
+            pass0.filename = filename;
+            $.ajax({
+                url: url1,
+                method: 'POST',
+                data: pass0,
+                complete: function (xhr, status) {
+                    setTimeout(function () {
+                        $('.loader').css('display', 'none');
+                    }, 1000);
+                },
+                success: function(response, xhr, status) {
+                    response = JSON.parse(response);
+                    status = response['responseStatus'];
+                    if (status == 'OK') {
+                        console.log(`File delete success in backend: ${filename}`);
+                        let form = $('#form-stock-excel');
+                        form.find('button[type="submit"]').removeClass('disabled');
+                    }
+                    else {
+                        console.log(`File delete failed in backend: ${filename}`);
+                    }
+                },
+                error: function(xhr, status) {
+                    // `status` will return 'error'
+                    console.log('xhr: ', xhr);
+                    console.log('Something went wrong......');
+                }
+            });
+        }, 1500);
     }
 </script>
