@@ -11,23 +11,29 @@ $db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 
 $op = $_POST["op"]; // 操作對象
 switch ($op) {
+    case 'deleteCheckData':
+        echo deleteCheckData(); // 刪除 盤點異動檔 資料
+        break;
+    case 'insertByBarcode':
+        echo insertByBarcode();
+        break;
     case 'login':
         echo login();
         break;
     case 'logout':
         echo logout();
         break;
-    case 'insertByBarcode':
-        echo insertByBarcode();
+    case 'listCheckData':
+        echo listCheckData(); // 顯示 盤點異動檔 資料
         break;
     case 'updateCheckData':
         echo updateCheckData(); // 更新盤點數量 by 盤點異動檔 的序號
         break;
-    case 'deleteCheckData':
-        echo deleteCheckData(); // 刪除 盤點異動檔 資料
+    case 'stockExport':
+        echo stockExport();
         break;
-    case 'listCheckData':
-        echo listCheckData(); // 顯示 盤點異動檔 資料
+    case 'stockImport':
+        echo stockImport();
         break;
     default:
         $r                   = array();
@@ -269,3 +275,91 @@ function listCheckData()
 //     fwrite($f, $msgText); //將新的資料寫入到原始的文件中
 //     fclose($f);
 // }
+################################
+# 查詢盤點資料
+#################################
+function stockImport()
+{
+    global $db;
+
+    $r   = array();
+
+    if (!empty($_FILES["excel_file"])) {
+        $comp_id = $_SESSION["comp_id"];
+        $c_house = $_POST["c_house"];
+        $check_date = $_POST["check_date"];
+
+        // echo "倉庫別：$c_house <br>";
+        // echo "盤點日期：$check_date <br>";
+
+        $file_name_array = explode(".", $_FILES["excel_file"]["name"]);
+        $file_extension = $file_name_array[1];
+
+        if ($file_extension == "csv" ||
+            $file_extension == "xls" ||
+            $file_extension == "xlsx"
+        ) {
+            require("../plugin/PHPExcel/IOFactory.php");
+
+            $file_tmp_name = $_FILES["excel_file"]["tmp_name"];
+
+            $file_type = PHPExcel_IOFactory::identify($file_tmp_name);
+
+            // Check uploaded file encoding
+            if (mb_check_encoding(file_get_contents($file_tmp_name), "BIG-5")) {
+                $excel_reader = PHPExcel_IOFactory::createReader($file_type)
+                    ->setInputEncoding("BIG5");
+                    // ->setDelimiter(",")
+                    // ->setEnclosure('"')
+                    // ->setSheetIndex(0)
+            } else {
+                // Default using UTF-8 encoding
+                $excel_reader = PHPExcel_IOFactory::createReader($file_type);
+            }
+
+            $excel_data_loaded = $excel_reader->load($file_tmp_name);
+            $data_stock_work_sheet = $excel_data_loaded->getActiveSheet();
+            $data_stock = $data_stock_work_sheet->toArray();
+
+            $data_stock_length = count($data_stock);
+            // Insert into `{$comp_id}_inv_stock` row by row
+            for ($i = 1; $i < $data_stock_length; $i++) {
+                $c_partno = $data_stock[$i][0]; // 產品編號 (機型)
+                $barcode  = $data_stock[$i][1]; // 條碼編號
+                $c_descrp = $data_stock[$i][2]; // 產品名稱
+                $c_qtyst  = $data_stock[$i][3]; // 現有庫存
+                $c_unit   = $data_stock[$i][4]; // 單位
+                $c_brand  = $data_stock[$i][5]; // 廠牌
+                $c_type   = $data_stock[$i][6]; // 類別
+
+                // 將庫存資料 新增至 庫存檔
+                $tbl       = $comp_id . "_inv_stock";    // 庫存檔
+                $sqlArr    = array();
+                $sqlArr["comp_id"]    = $comp_id;        // 公司別
+                $sqlArr["c_house"]    = $c_house;        // 倉庫別
+                $sqlArr["check_date"] = $check_date;     // 盤點日期
+                $sqlArr["c_partno"]   = $c_partno;       // 產品編號
+                $sqlArr["barcode"]    = $barcode;        // 條碼編號
+                $sqlArr["c_descrp"]   = $c_descrp;       // 產品名稱
+                $sqlArr["c_unit"]     = $c_unit;         // 單位
+                $sqlArr["c_type"]     = $c_type;         // 類別
+                $sqlArr["c_brand"]    = $c_brand;        // 廠牌
+                $sqlArr["c_qtyst"]    = $c_qtyst;        // 現有庫存
+                $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
+            }
+
+            $r['responseStatus']  = "OK";
+            $r['responseMessage'] = "資料匯入成功！";
+        }
+        else {
+            $r['responseStatus']  = "FAIL";
+            $r['responseMessage'] = "檔案格式出錯，請上傳 csv, xls, xlsx 格式的檔案。";
+        }
+    }
+    else {
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "沒有接收到檔案，請重新操作一次。";
+    }
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}

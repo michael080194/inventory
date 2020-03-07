@@ -22,11 +22,13 @@
     }
 </style>
 
+<{include file='loader.tpl' }>
+
 <div class="container">
     <h1 class="pt-4">匯入現有庫存</h1>
     <hr>
-    <form action="j00_stock.php" method="post" enctype="multipart/form-data">
-    <!-- <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate> -->
+    <!-- <form action="j00_stock.php" method="post" enctype="multipart/form-data"> -->
+    <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate>
         <input type="hidden" name="op" value="stockImport">
 
         <div class="form-row">
@@ -57,16 +59,12 @@
             <div class="invalid-feedback">請選擇檔案</div>
         </div>
 
-        <div class="alert alert-text <{$responseCss}>" role="alert">
-            <{$responseMessage}>
-        </div>
+        <div class="alert alert-text" role="alert"></div>
 
         <div class="form-group">
             <button type="submit" class="btn btn-main mt-3">匯入</button>
         </div>
     </form>
-    <div id="result">
-    </div>
 </div>
 
 <{include file='footer.tpl' }>
@@ -79,17 +77,17 @@
 
 <!-- Custom form validations -->
 <script>
-    $('.datetimepicker').datetimepicker({
-        // date: new Date(),
-        format: 'YYYY-MM-DD',
-        locale: moment.locale('zh-tw'),
-    });
-
     $('.custom-file-input').change(function() {
         let filename = $('#stock-excel').val().split('\\').slice(-1)[0];
         // Prevent the value from null: it will be null when no file was selected
         filename = (filename == '') ? '選擇檔案' : filename;
         $('#stock-excel').next().text(filename);
+    });
+
+    $('.datetimepicker').datetimepicker({
+        // date: new Date(),
+        format: 'YYYY-MM-DD',
+        locale: moment.locale('zh-tw'),
     });
 
     (function() {
@@ -104,8 +102,8 @@
                         event.preventDefault();
                         event.stopPropagation();
                     } else {
-                        kyc_stock_import();
                         event.preventDefault();
+                        kyc_stock_import(form);
                     }
                     form.classList.add('was-validated');
                 }, false);
@@ -113,30 +111,42 @@
         }, false);
     })();
 
-    function kyc_stock_import () {
+    function kyc_stock_import(form) {
+		var url1 = "/inventory/api/inventoryApi.php";
         $.ajax({
-            url: 'api_xls_import.php',
+            url: url1,
             method: 'POST',
-            data: new FormData(this),
+            data: new FormData(form),
             contentType: false,
             processData: false,
+			beforeSend: function (xhr) {
+				$('.loader').css('display', 'flex');
+			},
+			complete: function (xhr, status) {
+                setTimeout(function () {
+                    $('.loader').css('display', 'none');
+                }, 1000);
+			},
             success: function(response, xhr, status) {
-                response = JSON.parse(response);
-                status = response['responseStatus'];
-                let msg = response['responseMessage'];
-                let cssAlertColor = 'alert-danger';
-                if (status == 'OK') {
-                    $('#stock-excel').val('');
-                    cssAlertColor = 'alert-success';
-                }
-                $('.alert-text').addClass(cssAlertColor).text(msg);
-                $('.alert-text').show();
+                setTimeout(function () {
+                    response = JSON.parse(response);
+                    status = response['responseStatus'];
+                    let msg = response['responseMessage'];
+                    let cssAlertColor = 'alert-danger';
+                    if (status == 'OK') {
+                        cssAlertColor = 'alert-success';
+                    }
+                    $('.alert-text').addClass(cssAlertColor).text(msg);
+                    $('.alert-text').show();
+                }, 1000);
             },
             error: function(xhr, status) {
-                // `status` will return 'error'
-                console.log('xhr: ', xhr);
-                $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
-                $('.alert-text').show();
+                setTimeout(function () {
+                    // `status` will return 'error'
+                    console.log('xhr: ', xhr);
+                    $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
+                    $('.alert-text').show();
+                }, 1000);
             }
         });
     }
