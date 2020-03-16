@@ -182,8 +182,9 @@ function updateCheckData()
     $comp_id      = $_POST["comp_id"];    // 公司別
     $c_house      = $_POST["c_house"];    // 倉庫別
     $user         = $_POST["user"];       // 盤點人員
-    $check_id     = $_POST["check_id"];  // 盤點異動檔 的序號
-    $check_qty    = $_POST["check_qty"];  // 更新後之 盤點數量
+    $check_id     = $_POST["check_id"];   // 盤點異動檔 的序號
+    $check_qty    = $_POST["check_qty"];  // 更新後之 盤點數量 
+    $c_note       = $_POST["c_note"];     // 更新後之 備註說明
 
     global $db;
     $r   = array();
@@ -198,6 +199,7 @@ function updateCheckData()
 
     $sqlArr         = array();
     $sqlArr['check_qty'] = $check_qty;
+    $sqlArr['c_note'] = $c_note;
 
     $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
 
