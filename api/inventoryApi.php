@@ -1,4 +1,4 @@
-<?
+<?php
 // 盤點系統 與手機溝通之 API
 header('Access-Control-Allow-Origin: *'); //
 header("Content-Type:text/plain; charset=utf-8"); // text/html
@@ -17,6 +17,9 @@ switch ($op) {
     case 'insertByBarcode':
         echo insertByBarcode();
         break;
+    case 'insertBySearchStock':
+        echo insertBySearchStock();
+        break;
     case 'login':
         echo login();
         break;
@@ -25,6 +28,9 @@ switch ($op) {
         break;
     case 'listCheckData':
         echo listCheckData(); // 顯示 盤點異動檔 資料
+        break;
+    case 'searchStock':
+        echo searchStock(); // 查詢 現有庫存檔
         break;
     case 'updateCheckData':
         echo updateCheckData(); // 更新盤點數量 by 盤點異動檔 的序號
@@ -174,6 +180,58 @@ function insertByBarcode()
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
+################################
+# 查詢到資料後
+# 將所選取到之資料儲存
+# 並回傳 新增 id 及 產品基本資料
+#################################
+function insertBySearchStock()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_date   = $_POST["check_date"]; // 盤點日期
+    $c_partno     = $_POST["c_partno"];   // 產品編號
+    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
+    $c_unit       = $_POST["c_unit"];      // 單位
+    $barcode      = $_POST["barcode"];    // 條碼
+    $c_qty        = $_POST["c_qty"];      // 盤點數量
+
+    global $db;
+    if (!$comp_id or !$barcode) {
+        $r   = array();
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+
+    // 將盤點資料 新增至 盤點異動檔
+    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
+    $sqlArr    = array();
+    $sqlArr['comp_id']    = $comp_id;    // 公司別
+    $sqlArr['c_house']    = $c_house ;   // 倉庫別
+    $sqlArr['check_date'] = $check_date; // 盤點日期
+    $sqlArr['check_user'] = $user;       // 盤點人員
+    $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['barcode']    = $barcode;    // 條碼
+    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
+    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
+
+    $all = array();
+    $prods = array();
+    $prods['c_partno']=$c_partno;
+    $prods['barcode']=$barcode;
+    $prods['c_descrp']=$c_descrp;
+    $prods['c_unit']=$c_unit;
+    $all[] = $prods;
+
+    $all["insert_id"] = $insert_id;
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
 ###############################
 # 更新盤點數量 by 盤點異動檔 的序號
 #################################
@@ -269,17 +327,52 @@ function listCheckData()
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
-// ########################################################################
-// #  產生訊息檔,以供 debug
-// ########################################################################
-// function genMsgFile($fileName = "msg", $fileType = "txt", $msgText = "")
-// {
-//     // genMsgFile("001_", "txt", "AAAA");
-//     $file = "../dist/uploads/" . $fileName . "_" . strtotime("now") . "." . $fileType;
-//     $f    = fopen($file, 'w'); //以寫入方式開啟文件
-//     fwrite($f, $msgText); //將新的資料寫入到原始的文件中
-//     fclose($f);
-// }
+################################
+# 查詢 現有庫存檔
+#################################
+function searchStock()
+{
+    global $db;
+    $r   = array();
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = $check_date->format('Y-m-d H:i:s');
+    $c_partno     = $_POST["c_partno"];   // 產品編號
+    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
+
+
+    if (!$comp_id ) {
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl1             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND check_date = '{$check_date}'";
+
+    $searchCondition .= ($c_partno != "") ? "AND  c_partno Like '%{$c_partno}%'" : "";
+    $searchCondition .= ($c_descrp != "") ? "AND  c_descrp Like '%{$c_descrp}%'" : "";
+    $sql =  "select * from `$tbl1`  WHERE " . $searchCondition;
+
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+    $all = array();
+    $count = 0;
+    foreach ($result as $prods) {
+        $all[] = $prods;
+        $count ++;
+    }
+    if($count == 0){
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "查不到資料";
+    } else {
+        $r['responseStatus']  = "OK";
+        $r['responseMessage'] = "";
+        $r['responseArray']   = $all;
+    }
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
 ################################
 # 匯出盤點明細表
 #################################
