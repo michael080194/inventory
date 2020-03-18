@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content:">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#4caf50">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <title>雲端盤點系統</title>
+    <link rel="stylesheet" href="libs/framework7/css/framework7.min.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Statusbar -->
+        <f7-statusbar></f7-statusbar>
+
+        <!-- Main View -->
+        <f7-view id="main-view" main :stack-pages="true">
+            <f7-page color-theme="green" :class="{'opacity-0': !isMounted, 'opacity-1': isMounted}">
+                <f7-navbar title="雲端盤點系統"></f7-navbar>
+
+                <f7-toolbar tabbar labels bottom-md no-shadow inner>
+                    <f7-link icon-f7="info" text="關於" tab-link="#tab-about"></f7-link>
+                    <f7-link icon-f7="person" text="登入" tab-link="#tab-login" @click="tabFocusInput('login')" tab-link-active></f7-link>
+                    <f7-link icon-f7="gear" text="設定" tab-link="#tab-setting" @click="tabFocusInput('setting')"></f7-link>
+                </f7-toolbar>
+
+                <f7-tabs swipeable>
+                    <f7-tab id="tab-about">
+                        <f7-block class="block-title-p">關於頁面</f7-block>
+                    </f7-tab>
+                    <f7-tab id="tab-login" tab-active>
+                        <f7-block-title>登入</f7-block-title>
+                        <f7-list no-hairlines-md>
+                            <f7-list-item>
+                                <f7-label>公司別代號</f7-label>
+                                <f7-input type="text" name="comp_id" placeholder="請輸入公司別代號" :value="login.comp_id" @input="login.comp_id=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>使用者名稱</f7-label>
+                                <f7-input type="text" name="user" placeholder="請輸入使用者名稱" :value="login.user" @input="login.user=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>使用者密碼</f7-label>
+                                <f7-input type="password" name="pass" placeholder="請輸入使用者密碼" :value="login.pass" @input="login.pass=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                        </f7-list>
+                        <f7-block>
+                            <f7-row>
+                                <f7-col width="33">
+                                    <f7-button big fill raised @click="userLogin">登入</f7-button>
+                                </f7-col>
+                            </f7-row>
+                        </f7-block>
+                    </f7-tab>
+                    <f7-tab id="tab-setting">
+                        <f7-block-title>自訂預設資訊</f7-block-title>
+                        <f7-list no-hairlines-md>
+                            <f7-list-item>
+                                <f7-label>公司別代號</f7-label>
+                                <f7-input type="text" name="s_comp_id" placeholder="請輸入公司別代號" :value="setting.comp_id" @input="setting.comp_id=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>使用者名稱</f7-label>
+                                <f7-input type="text" name="s_user" placeholder="請輸入使用者名稱" :value="setting.user" @input="setting.user=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>使用者密碼</f7-label>
+                                <f7-input type="password" name="s_pass" placeholder="請輸入使用者密碼" :value="setting.pass" @input="setting.pass=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                        </f7-list>
+                        <f7-block>
+                            <f7-row>
+                                <f7-col width="33">
+                                    <f7-button big fill raised @click="userSetting">儲存</f7-button>
+                                </f7-col>
+                            </f7-row>
+                        </f7-block>
+                    </f7-tab>
+                </f7-tabs>
+            </f7-page>
+        </f7-view>
+    </div>
+
+    <!-- Page Index Template -->
+    <template id="page-index">
+        <f7-page color-theme="green">
+            <f7-navbar :title="title">
+                <f7-nav-right>
+                    <f7-link icon-f7="reply_fill" class="flip-horizontal" @click="userLogout"></f7-link>
+                </f7-nav-right>
+            </f7-navbar>
+
+            <f7-block-title class="block-title-p">你好，{{ user }} (user) / {{ comp_id }} (comp_id)</f7-block-title>
+            <f7-list no-hairlines-md>
+                <f7-list-item>
+                    <f7-label>倉庫別</f7-label>
+                    <f7-input type="text" name="c_house" placeholder="請輸入倉庫別" :value="c_house" @input="c_house=$event.target.value" autofocus clear-button></f7-input>
+                </f7-list-item>
+                <f7-list-item>
+                    <f7-label>盤點日期</f7-label>
+                    <f7-input type="date" name="check_date" placeholder="請輸入盤點日期" :value="check_date" @input="check_date=$event.target.value" autofocus clear-button></f7-input>
+                </f7-list-item>
+            </f7-list>
+            <f7-block>
+                <f7-row>
+                    <f7-col>
+                        <f7-button big fill raised @click="startInventory">盤點庫存</f7-button>
+                    </f7-col>
+                    <f7-col>
+                        <f7-button big fill raised @click="checkInventory">查看庫存</f7-button>
+                    </f7-col>
+                </f7-row>
+            </f7-block>
+        </f7-page>
+    </template>
+
+    <!-- Page Check Inventory Template -->
+    <template id="page-check-inventory">
+        <f7-page color-theme="green">
+            <f7-navbar title="查看庫存" back-link="Back"></f7-navbar>
+
+            <f7-block-title class="block-title-p">倉庫別：{{ c_house }}</f7-block-title>
+
+            <f7-block-title>現有庫存列表：</f7-block-title>
+            <f7-list media-list v-if="checkItems.length">
+                <f7-list-item
+                    v-for="(item, key, index) in checkItems"
+                    :title="item.c_partno"
+                    :subtitle="item.c_descrp"
+                    :text="item.check_qty + ' ' + item.c_unit + ' / ' + item.barcode + ' / ' + item.c_note"
+                    :after="item.check_date">
+                </f7-list-item>
+            </f7-list>
+            <f7-list media-list v-else>
+                <f7-list-item title="查無庫存"></f7-list-item>
+            </f7-list>
+        </f7-page>
+    </template>
+
+    <!-- Page Search Template -->
+    <template id="page-search-inventory">
+        <f7-page color-theme="green">
+            <f7-navbar title="搜尋產品條碼" back-link="Back"></f7-navbar>
+
+            <f7-block-title class="block-title-p">倉庫別：{{ c_house }}</f7-block-title>
+            <f7-block-title class="block-title-p">盤點日期：{{ check_date }}</f7-block-title>
+
+            <f7-block-title>搜尋條件：</f7-block-title>
+            <f7-list no-hairlines-md>
+                <f7-list-item>
+                    <f7-label>產品編號</f7-label>
+                    <f7-input type="text" name="c_partno" placeholder="請輸入產品編號" :value="c_partno" @input="c_partno=$event.target.value" autofocus clear-button></f7-input>
+                </f7-list-item>
+                <f7-list-item>
+                    <f7-label>產品名稱</f7-label>
+                    <f7-input type="text" name="c_descrp" placeholder="請輸入產品名稱" :value="c_descrp" @input="c_descrp=$event.target.value" autofocus clear-button></f7-input>
+                </f7-list-item>
+            </f7-list>
+            <f7-block>
+                <f7-row>
+                    <f7-col width="50">
+                        <f7-button big fill raised @click="searchInventoryBarcodeByPartnoOrDescrp">搜尋產品資料</f7-button>
+                    </f7-col>
+                </f7-row>
+            </f7-block>
+
+            <f7-block-title v-if="searchedItems.length">現有庫存結果：</f7-block-title>
+            <f7-list media-list>
+                <f7-list-item swipeout
+                    v-for="(item, key, index) in searchedItems"
+                    :title="item[1]"
+                    :subtitle="item[2]"
+                    :text="item[3] + ' ' + item[4] + ' / ' + item[5]">
+                    <f7-swipeout-actions left>
+                        <f7-swipeout-button color="blue" @click="insertInventoryItemBySearchStock(key)" close><f7-icon f7="add_round_fill"></f7-icon>&nbsp;新增</f7-swipeout-button>
+                    </f7-swipeout-actions>
+                </f7-list-item>
+            </f7-list>
+        </f7-page>
+    </template>
+
+    <!-- Page Start Inventory Template -->
+    <template id="page-start-inventory">
+        <f7-page color-theme="green">
+            <f7-navbar title="盤點庫存" back-link="Back">
+                <f7-nav-right>
+                    <f7-link icon-f7="search" @click="searchInventory"></f7-link>
+                </f7-nav-right>
+            </f7-navbar>
+
+            <f7-block-title class="block-title-p">倉庫別：{{ c_house }}</f7-block-title>
+            <f7-block-title class="block-title-p">盤點日期：{{ check_date }}</f7-block-title>
+
+            <f7-block>
+                <f7-row no-gap style="align-items: center;">
+                    <f7-col width="75">
+                        <form @submit.prevent="insertInventoryItem">
+                            <f7-list no-hairlines-md style="margin: 0">
+                                <f7-list-item>
+                                    <f7-label>條碼</f7-label>
+                                    <f7-input type="text" name="barcode" placeholder="請輸入條碼" :value="barcode" @input="barcode=$event.target.value" autofocus clear-button></f7-input>
+                                </f7-list-item>
+                            </f7-list>
+                            <f7-input type="submit" value="送出條碼" hidden></f7-input>
+                        </form>
+                    </f7-col>
+                    <f7-col width="25">
+                        <f7-button big fill raised @click="scanBarcode">掃條碼</f7-button>
+                    </f7-col>
+                </f7-row>
+            </f7-block>
+
+            <f7-block-title v-if="insertedItems.length">剛剛新增的盤點資料：</f7-block-title>
+            <f7-list media-list>
+                <f7-list-item swipeout
+                    v-for="(item, key, index) in insertedItems"
+                    :title="item[1]"
+                    :subtitle="item[2]"
+                    :text="item[3] + ' ' + item[4] + ' / ' + item[5] + ' / ' + item[6]"
+                    :after="item[7]">
+                    <f7-swipeout-actions left>
+                        <f7-swipeout-button color="blue" @click="currentInventoryItemUpdate(item[0])" close><f7-icon f7="compose"></f7-icon></f7-swipeout-button>
+                        <f7-swipeout-button color="red" @click="currentInventoryItemDelete(item[0], key)" close><f7-icon f7="trash"></f7-icon></f7-swipeout-button>
+                    </f7-swipeout-actions>
+                </f7-list-item>
+            </f7-list>
+        </f7-page>
+    </template>
+
+    <!-- Cordova -->
+    <script src="cordova.js"></script>
+
+    <!-- Framework7 library -->
+    <script src="libs/framework7/js/framework7.min.js"></script>
+
+    <!-- Vue -->
+    <script src="libs/vue/vue.min.js"></script>
+
+    <!-- Framework7-Vue plugin -->
+    <script src="libs/framework7-vue/framework7-vue.min.js"></script>
+
+    <!-- Your custom app scripts -->
+    <script src="js/app.js"></script>
+</body>
+</html>

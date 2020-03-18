@@ -1,0 +1,79 @@
+/* Your app styles here */
+body {
+    /*animation: 2s fadeIn;*/
+    animation-fill-mode: forwards;
+    background-image: url('../icon.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    font-size: 18px;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+p {
+    font-weight: bold !important;
+}
+
+.block-title-p {
+    color: #212121 !important;
+    font-size: 18px !important;
+    line-height: 20px !important;
+}
+
+.button {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    height: 52px !important;
+    line-height: 52px !important;
+}
+
+.list {
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
+.list input[type='text'] {
+    font-size: 20px !important;
+}
+
+.flip-horizontal {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.rotate-90-clockwise {
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.dialog-button {
+    color: #4caf50 !important;
+}
+
+.item-input-focused .item-input-wrap:after {
+    background-color: #4caf50 !important;
+}
+
+.opacity-0 {
+    opacity: 0;
+    transition: .2s;
+}
+
+.opacity-1 {
+    opacity: 1;
+    transition: .2s;
+}
