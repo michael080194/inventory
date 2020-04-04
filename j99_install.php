@@ -44,6 +44,15 @@ function gen_table($tablePrefix)
 {
     $web_path = str_replace("\\", "/", dirname(__FILE__));
     global $db, $WEB;
+    $sql = "select * from `{$tablePrefix}_inv_stock` LIMIT 1";
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+
+    if($result == true){ // table exist
+       // echo(count($result));
+       die("資料表已存在");
+    } else{
+       // die("456");
+    }
     mk_dir($web_path . "/uploads");
     // $tablePrefix = $WEB['prefix'];
     $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
