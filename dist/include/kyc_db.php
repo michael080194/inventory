@@ -14,7 +14,10 @@ if (!class_exists('KYC_DB')) {
 
         public function kyc_connect()
         {
-            return new mysqli($this->host, $this->user, $this->password, $this->database);
+            $connectDB = new mysqli($this->host, $this->user, $this->password, $this->database);
+            $connectDB -> set_charset("utf8");
+            // return new mysqli($this->host, $this->user, $this->password, $this->database);
+            return $connectDB;
         }
 
         public function kyc_tableOperation($query)
