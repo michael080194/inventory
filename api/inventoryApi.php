@@ -28,7 +28,7 @@ switch ($op) {
         break;
     case 'deleteStockData':
         // 網頁版程式用
-        // 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點日期
+        // 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點檔上傳日期
         echo deleteStockData();
         break;
     case 'insertByBarcode':
@@ -106,13 +106,13 @@ function deleteCheckData()
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ###############################
-# 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點日期
+# 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點檔上傳日期
 #################################
 function deleteStockData()
 {
     $comp_id      = $_POST["comp_id"];    // 公司別
     $c_house      = $_POST["c_house"];    // 倉庫別
-    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = new DateTime($_POST["check_date"]); // 盤點檔上傳日期
     $check_date   = $check_date->format('Y-m-d H:i:s');
 
     global $db;

@@ -90,13 +90,13 @@
     <!-- Page Index Template -->
     <template id="page-index">
         <f7-page color-theme="green">
-            <f7-navbar :title="title">
+            <f7-navbar title="雲端盤點系統">
                 <f7-nav-right>
                     <f7-link icon-f7="reply_fill" class="flip-horizontal" @click="userLogout"></f7-link>
                 </f7-nav-right>
             </f7-navbar>
 
-            <f7-block-title class="block-title-p">你好，{{ user }} (user) / {{ comp_id }} (comp_id)</f7-block-title>
+            <f7-block-title class="block-title-p">你好，{{ user }} / {{ comp_id }}</f7-block-title>
             <f7-list no-hairlines-md>
                 <f7-list-item>
                     <f7-label>倉庫別</f7-label>
@@ -110,10 +110,10 @@
             <f7-block>
                 <f7-row>
                     <f7-col>
-                        <f7-button big fill raised @click="startInventory">盤點庫存</f7-button>
+                        <f7-button big fill raised @click="startInventory">開始盤點</f7-button>
                     </f7-col>
                     <f7-col>
-                        <f7-button big fill raised @click="checkInventory">查看庫存</f7-button>
+                        <f7-button big fill raised @click="checkInventory">顯示盤點</f7-button>
                     </f7-col>
                 </f7-row>
             </f7-block>
