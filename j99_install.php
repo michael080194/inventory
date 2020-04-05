@@ -54,11 +54,11 @@ function gen_table($tablePrefix)
        // die("456");
     }
     mk_dir($web_path . "/uploads");
-    // $tablePrefix = $WEB['prefix'];
-    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
-    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_stock");
-    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_check");
-    $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_system");
+
+    // $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_user");
+    // $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_stock");
+    // $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_check");
+    // $db->kyc_tableOperation("DROP TABLE IF EXISTS {$tablePrefix}_inv_system");
 
     create_table($tablePrefix);
 
@@ -127,6 +127,7 @@ function create_table($tablePrefix = "")
     `barcode`    char(20)       COMMENT '絛碼編號',
     `check_qty`  mediumint(7)   COMMENT '盤點數量',
     `c_note`     varchar(255)   COMMENT '備註',
+    `create_date` datetime      NOT NULL COMMENT '建檔時間',
     PRIMARY KEY (`id`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     $db->kyc_tableOperation($sql);
