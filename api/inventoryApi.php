@@ -189,7 +189,7 @@ function insertByBarcode()
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
     $sqlArr['barcode']    = $barcode;    // 條碼
     $sqlArr['check_qty']  = $c_qty;      // 盤點人員
-    $sqlArr['create_date']  = $dt;  // 建檔時間
+    $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
     $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
 
     $all["insert_id"] = $insert_id;
@@ -235,7 +235,7 @@ function insertBySearchStock()
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
     $sqlArr['barcode']    = $barcode;    // 條碼
     $sqlArr['check_qty']  = $c_qty;      // 盤點人員
-    $sqlArr['create_date']  = $dt;  // 建檔時間
+    $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
     $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
 
     $all = array();
@@ -274,7 +274,7 @@ function listCheckData()
     $searchCondition =  "a.comp_id = '{$comp_id}' AND a.c_house = '{$c_house}' AND ";
     $searchCondition .= "a.check_user = '{$user}' AND a.check_date = '{$check_date}'";
 
-    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition;
+    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition . " order by a.create_date DESC";
 
     $result          = $db->kyc_sqlFetch_assoc($sql);
     $r   = array();
