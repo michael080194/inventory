@@ -131,10 +131,11 @@ Vue.component('page-check-inventory', {
             var app = self.$f7;
 
             var params = {
-                op:      'listCheckData',
-                comp_id: self.comp_id,
-                c_house: self.c_house,
-                user:    self.user,
+                op:        'listCheckData',
+                comp_id:    self.comp_id,
+                c_house:    self.c_house,
+                user:       self.user,
+                check_date: self.check_date,
             };
 
             app.request({
