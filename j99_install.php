@@ -105,7 +105,7 @@ function create_table($tablePrefix = "")
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '建檔序號',
     `comp_id`    char(20)      NOT NULL COMMENT '公司別',
     `c_house`    char(20)      NOT NULL COMMENT '倉庫別',
-    `check_date` datetime      NOT NULL COMMENT '盤點日期',
+    `check_date` datetime      NOT NULL COMMENT '盤點檔上傳日期',
     `c_partno`   varchar(255)  NOT NULL COMMENT '產品編號',
     `barcode`    char(20)      NOT NULL COMMENT '絛碼編號',
     `c_descrp`   varchar(255)  NOT NULL COMMENT '產品名稱',
