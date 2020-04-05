@@ -11,37 +11,64 @@ $db = new kyc_db(_DB_HOST, _DB_USER, _DB_PASS, _DB_NAME);
 
 $op = $_POST["op"]; // 操作對象
 switch ($op) {
-    case 'deleteCheckData':
-        echo deleteCheckData(); // 刪除 盤點異動檔 資料
-        break;
-    case 'insertByBarcode':
-        echo insertByBarcode();
-        break;
-    case 'insertBySearchStock':
-        echo insertBySearchStock();
-        break;
     case 'login':
+        // app 手機程式用
+        // 檢查使用者之公司別，帳號，密碼
         echo login();
         break;
     case 'logout':
+        // 網頁版程式用
+        // 登出會清除 session
         echo logout();
         break;
+    case 'deleteCheckData':
+        // app 手機程式用
+        // 刪除 盤點異動檔單筆(inv_check) 資料 by 公司別+倉庫別+盤點人員+id序號
+        echo deleteCheckData();
+        break;
+    case 'deleteStockData':
+        // 網頁版程式用
+        // 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點日期
+        echo deleteStockData();
+        break;
+    case 'insertByBarcode':
+        // app 手機程式用
+        // 盤點人員掃條碼後;insert 一筆資料至盤點檔(inv_check);並回傳 新增 id 及 產品基本資料
+        echo insertByBarcode();
+        break;
+    case 'insertBySearchStock':
+        // app 手機程式用
+        // 盤點人員 查詢盤點庫存檔(inv_stock)；利用所選取到之資料；
+        // insert 一筆資料至盤點檔(inv_check);並回傳 新增 id 及 產品基本資料
+        echo insertBySearchStock();
+        break;
     case 'listCheckData':
-        echo listCheckData(); // 顯示 盤點異動檔 資料
+         // app 手機程式用
+         // 顯示 公司別+倉庫別+盤點人員+盤點日期 之盤點資料(inv_check)
+        echo listCheckData();
         break;
     case 'searchStock':
+        // app 手機程式用
+        // 在無法掃描時;查詢 盤點現有庫存檔(inv_stock);讓盤點人員挑選資料來輸入盤點資料
+        // 顯示 公司別+倉庫別+盤點日期 之現有盤點庫存資料(可用產品編號及品名查詢)
         echo searchStock(); // 查詢 現有庫存檔
         break;
     case 'updateCheckData':
-        echo updateCheckData(); // 更新盤點數量 by 盤點異動檔 的序號
+         // app 手機程式用
+         // 更新盤點檔(inv_check)數量 by 盤點異動檔 by 公司別+倉庫別+盤點人員+序號
+        echo updateCheckData();
         break;
     case 'stockExport':
+        // 網頁版程式用
+        // 匯出 Excel 檔
         echo stockExport();
         break;
     case 'stockExportFileDelete':
         echo stockExportFileDelete();
         break;
     case 'stockImport':
+        // 網頁版程式用
+        // 匯入 Excel 檔
         echo stockImport();
         break;
     default:
@@ -49,6 +76,217 @@ switch ($op) {
         $r['responseStatus'] = "FAIL";
         echo json_encode($r, JSON_UNESCAPED_UNICODE);
         break;
+}
+###############################
+# 刪除 盤點異動檔 資料
+#################################
+function deleteCheckData()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_id     = $_POST["check_id"];  // 盤點異動檔 的序號
+
+    global $db;
+    $r   = array();
+    if (!$comp_id or !$check_id) {
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl             = $comp_id . "_inv_check"; // 盤點異動檔
+    $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
+    $deleteCondition .= "check_user = '{$user}' AND id= '{$check_id}' ";
+
+    $db->kyc_sqlDelete($tbl, $deleteCondition);
+
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+###############################
+# 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點日期
+#################################
+function deleteStockData()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = $check_date->format('Y-m-d H:i:s');
+
+    global $db;
+    $r   = array();
+    if (!$comp_id or !$c_house) {
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl             = $comp_id . "_inv_stock"; // 盤點庫存檔
+    $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
+    $deleteCondition .= "check_date = '{$check_date}' ";
+
+    $db->kyc_sqlDelete($tbl, $deleteCondition);
+
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 盤點人員掃條碼後將資料送雲端
+# 此 function 會 insert 一筆資料至盤點檔
+# 並回傳 新增 id 及 產品基本資料
+#################################
+function insertByBarcode()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_date   = $_POST["check_date"]; // 盤點日期
+    $barcode      = $_POST["barcode"];    // 條碼
+    $c_qty        = $_POST["c_qty"];      // 盤點數量
+
+    global $db;
+    if (!$comp_id or !$barcode) {
+        $r   = array();
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    // 用 barcode 抓取產品產品基本資料
+    $tbl             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition = "`comp_id` = '{$comp_id}' AND `c_house` = '{$c_house}' AND `barcode` = '{$barcode}' ";
+    $sql             = "SELECT * FROM `$tbl` WHERE " . $searchCondition;
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+
+    $r   = array();
+    $all = array();
+    $c_partno = ""; // 產品編號
+    $wkcount = 0;
+    foreach ($result as $prods) {
+        $wkcount++;
+        $c_partno   = $prods['c_partno'];
+        $all[] = $prods;
+    }
+    // 條碼不存在於 現有庫存檔
+    if($wkcount == 0){
+        $prods = array();
+        $prods['c_partno']="";
+        $prods['c_descrp']="";
+        $prods['c_unit']="";
+        $all[] = $prods;
+    }
+    // 將盤點資料 新增至 盤點異動檔
+    $dt = new DateTime();
+
+    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
+    $sqlArr    = array();
+    $sqlArr['comp_id']    = $comp_id;    // 公司別
+    $sqlArr['c_house']    = $c_house ;   // 倉庫別
+    $sqlArr['check_date'] = $check_date; // 盤點日期
+    $sqlArr['check_user'] = $user;       // 盤點人員
+    $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['barcode']    = $barcode;    // 條碼
+    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
+    $sqlArr['create_date']  = $dt;  // 建檔時間
+    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
+
+    $all["insert_id"] = $insert_id;
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 查詢到資料後
+# 將所選取到之資料儲存
+# 並回傳 新增 id 及 產品基本資料
+#################################
+function insertBySearchStock()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_date   = $_POST["check_date"]; // 盤點日期
+    $c_partno     = $_POST["c_partno"];   // 產品編號
+    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
+    $c_unit       = $_POST["c_unit"];      // 單位
+    $barcode      = $_POST["barcode"];    // 條碼
+    $c_qty        = $_POST["c_qty"];      // 盤點數量
+
+    global $db;
+    if (!$comp_id or !$barcode) {
+        $r   = array();
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+
+    // 將盤點資料 新增至 盤點異動檔
+    $dt = new DateTime();
+    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
+    $sqlArr    = array();
+    $sqlArr['comp_id']    = $comp_id;    // 公司別
+    $sqlArr['c_house']    = $c_house ;   // 倉庫別
+    $sqlArr['check_date'] = $check_date; // 盤點日期
+    $sqlArr['check_user'] = $user;       // 盤點人員
+    $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['barcode']    = $barcode;    // 條碼
+    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
+    $sqlArr['create_date']  = $dt;  // 建檔時間
+    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
+
+    $all = array();
+    $prods = array();
+    $prods['c_partno']=$c_partno;
+    $prods['barcode']=$barcode;
+    $prods['c_descrp']=$c_descrp;
+    $prods['c_unit']=$c_unit;
+    $all[] = $prods;
+
+    $all["insert_id"] = $insert_id;
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 顯示 公司別+倉庫別+盤點人員+盤點日期 之盤點資料(inv_check)
+#################################
+function listCheckData()
+{
+    global $db;
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = $check_date->format('Y-m-d H:i:s');
+
+    if (!$comp_id or !$user ) {
+        return "FAIL";
+    }
+
+    $tbl1             = $comp_id . "_inv_check"; // 盤點異動檔
+    $tbl2             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition =  "a.comp_id = '{$comp_id}' AND a.c_house = '{$c_house}' AND ";
+    $searchCondition .= "a.check_user = '{$user}' AND a.check_date = '{$check_date}'";
+
+    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition;
+
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+    $r   = array();
+    $all = array();
+    foreach ($result as $prods) {
+        $all[] = $prods;
+    }
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ################################
 # 使用者登錄檢查
@@ -118,216 +356,6 @@ function logout()
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ################################
-# 盤點人員掃條碼後將資料送雲端
-# 此 function 會 insert 一筆資料至盤點檔
-# 並回傳 新增 id 及 產品基本資料
-#################################
-function insertByBarcode()
-{
-    $comp_id      = $_POST["comp_id"];    // 公司別
-    $c_house      = $_POST["c_house"];    // 倉庫別
-    $user         = $_POST["user"];       // 盤點人員
-    $check_date   = $_POST["check_date"]; // 盤點日期
-    $barcode      = $_POST["barcode"];    // 條碼
-    $c_qty        = $_POST["c_qty"];      // 盤點數量
-
-    global $db;
-    if (!$comp_id or !$barcode) {
-        $r   = array();
-        $r['responseStatus']  = "FAIL";
-        return json_encode($r, JSON_UNESCAPED_UNICODE);
-    }
-
-    // 用 barcode 抓取產品產品基本資料
-    $tbl             = $comp_id . "_inv_stock"; // 現有庫存檔
-    $searchCondition = "`comp_id` = '{$comp_id}' AND `c_house` = '{$c_house}' AND `barcode` = '{$barcode}' ";
-    $sql             = "SELECT * FROM `$tbl` WHERE " . $searchCondition;
-    $result          = $db->kyc_sqlFetch_assoc($sql);
-
-    $r   = array();
-    $all = array();
-    $c_partno = ""; // 產品編號
-    $wkcount = 0;
-    foreach ($result as $prods) {
-        $wkcount++;
-        $c_partno   = $prods['c_partno'];
-        $all[] = $prods;
-    }
-    // 條碼不存在於 現有庫存檔
-    if($wkcount == 0){
-        $prods = array();
-        $prods['c_partno']="";
-        $prods['c_descrp']="";
-        $prods['c_unit']="";
-        $all[] = $prods;
-    }
-    // 將盤點資料 新增至 盤點異動檔
-    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
-    $sqlArr    = array();
-    $sqlArr['comp_id']    = $comp_id;    // 公司別
-    $sqlArr['c_house']    = $c_house ;   // 倉庫別
-    $sqlArr['check_date'] = $check_date; // 盤點日期
-    $sqlArr['check_user'] = $user;       // 盤點人員
-    $sqlArr['c_partno']   = $c_partno;   // 產品編號
-    $sqlArr['barcode']    = $barcode;    // 條碼
-    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
-    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
-
-    $all["insert_id"] = $insert_id;
-    $r['responseStatus']  = "OK";
-    $r['responseMessage'] = "";
-    $r['responseArray']   = $all;
-
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-################################
-# 查詢到資料後
-# 將所選取到之資料儲存
-# 並回傳 新增 id 及 產品基本資料
-#################################
-function insertBySearchStock()
-{
-    $comp_id      = $_POST["comp_id"];    // 公司別
-    $c_house      = $_POST["c_house"];    // 倉庫別
-    $user         = $_POST["user"];       // 盤點人員
-    $check_date   = $_POST["check_date"]; // 盤點日期
-    $c_partno     = $_POST["c_partno"];   // 產品編號
-    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
-    $c_unit       = $_POST["c_unit"];      // 單位
-    $barcode      = $_POST["barcode"];    // 條碼
-    $c_qty        = $_POST["c_qty"];      // 盤點數量
-
-    global $db;
-    if (!$comp_id or !$barcode) {
-        $r   = array();
-        $r['responseStatus']  = "FAIL";
-        return json_encode($r, JSON_UNESCAPED_UNICODE);
-    }
-
-
-    // 將盤點資料 新增至 盤點異動檔
-    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
-    $sqlArr    = array();
-    $sqlArr['comp_id']    = $comp_id;    // 公司別
-    $sqlArr['c_house']    = $c_house ;   // 倉庫別
-    $sqlArr['check_date'] = $check_date; // 盤點日期
-    $sqlArr['check_user'] = $user;       // 盤點人員
-    $sqlArr['c_partno']   = $c_partno;   // 產品編號
-    $sqlArr['barcode']    = $barcode;    // 條碼
-    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
-    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
-
-    $all = array();
-    $prods = array();
-    $prods['c_partno']=$c_partno;
-    $prods['barcode']=$barcode;
-    $prods['c_descrp']=$c_descrp;
-    $prods['c_unit']=$c_unit;
-    $all[] = $prods;
-
-    $all["insert_id"] = $insert_id;
-    $r['responseStatus']  = "OK";
-    $r['responseMessage'] = "";
-    $r['responseArray']   = $all;
-
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-###############################
-# 更新盤點數量 by 盤點異動檔 的序號
-#################################
-function updateCheckData()
-{
-    $comp_id      = $_POST["comp_id"];    // 公司別
-    $c_house      = $_POST["c_house"];    // 倉庫別
-    $user         = $_POST["user"];       // 盤點人員
-    $check_id     = $_POST["check_id"];   // 盤點異動檔 的序號
-    $check_qty    = $_POST["check_qty"];  // 更新後之 盤點數量 
-    $c_note       = $_POST["c_note"];     // 更新後之 備註說明
-
-    global $db;
-    $r   = array();
-    if (!$comp_id or !$check_id) {
-        $r['responseStatus']  = "FAIL";
-        return json_encode($r, JSON_UNESCAPED_UNICODE);
-    }
-
-    $tbl             = $comp_id . "_inv_check"; // 盤點異動檔
-    $updateCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
-    $updateCondition .= "check_user = '{$user}'  AND id= '{$check_id}' ";
-
-    $sqlArr         = array();
-    $sqlArr['check_qty'] = $check_qty;
-    $sqlArr['c_note'] = $c_note;
-
-    $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
-
-    $r['responseStatus']  = "OK";
-    $r['responseMessage'] = "";
-
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-###############################
-# 刪除 盤點異動檔 資料
-#################################
-function deleteCheckData()
-{
-    $comp_id      = $_POST["comp_id"];    // 公司別
-    $c_house      = $_POST["c_house"];    // 倉庫別
-    $user         = $_POST["user"];       // 盤點人員
-    $check_id     = $_POST["check_id"];  // 盤點異動檔 的序號
-
-    global $db;
-    $r   = array();
-    if (!$comp_id or !$check_id) {
-        $r['responseStatus']  = "FAIL";
-        return json_encode($r, JSON_UNESCAPED_UNICODE);
-    }
-
-    $tbl             = $comp_id . "_inv_check"; // 盤點異動檔
-    $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
-    $deleteCondition .= "check_user = '{$user}' AND id= '{$check_id}' ";
-
-    $db->kyc_sqlDelete($tbl, $deleteCondition);
-
-    $r['responseStatus']  = "OK";
-    $r['responseMessage'] = "";
-
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-################################
-# 查詢盤點資料
-#################################
-function listCheckData()
-{
-    global $db;
-    $comp_id      = $_POST["comp_id"];    // 公司別
-    $c_house      = $_POST["c_house"];    // 倉庫別
-    $user         = $_POST["user"];       // 盤點人員
-
-    if (!$comp_id or !$user ) {
-        return "FAIL";
-    }
-
-    $tbl1             = $comp_id . "_inv_check"; // 盤點異動檔
-    $tbl2             = $comp_id . "_inv_stock"; // 現有庫存檔
-    $searchCondition =  "a.comp_id = '{$comp_id}' AND a.c_house = '{$c_house}' AND ";
-    $searchCondition .= "a.check_user = '{$user}' ";
-
-    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition;
-
-    $result          = $db->kyc_sqlFetch_assoc($sql);
-    $r   = array();
-    $all = array();
-    foreach ($result as $prods) {
-        $all[] = $prods;
-    }
-    $r['responseStatus']  = "OK";
-    $r['responseMessage'] = "";
-    $r['responseArray']   = $all;
-
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-################################
 # 查詢 現有庫存檔
 #################################
 function searchStock()
@@ -342,9 +370,9 @@ function searchStock()
     $c_descrp     = $_POST["c_descrp"];   // 產品名稱
 
 
-    if (!$comp_id ) {
+    if (!$comp_id) {
         $r['responseStatus']  = "FAIL";
-        $r['responseMessage'] = "";
+        $r['responseMessage'] = "公司別空白";
         return json_encode($r, JSON_UNESCAPED_UNICODE);
     }
 
@@ -625,6 +653,40 @@ function stockImport()
         $r['responseStatus']  = "FAIL";
         $r['responseMessage'] = "沒有接收到檔案，請重新操作一次。";
     }
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+###############################
+# 更新盤點數量 by 盤點異動檔 的序號
+#################################
+function updateCheckData()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_id     = $_POST["check_id"];   // 盤點異動檔 的序號
+    $check_qty    = $_POST["check_qty"];  // 更新後之 盤點數量 
+    $c_note       = $_POST["c_note"];     // 更新後之 備註說明
+
+    global $db;
+    $r   = array();
+    if (!$comp_id or !$check_id) {
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl             = $comp_id . "_inv_check"; // 盤點異動檔
+    $updateCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
+    $updateCondition .= "check_user = '{$user}'  AND id= '{$check_id}' ";
+
+    $sqlArr         = array();
+    $sqlArr['check_qty'] = $check_qty;
+    $sqlArr['c_note'] = $c_note;
+
+    $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
+
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
