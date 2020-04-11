@@ -12,8 +12,8 @@ Vue.component('page-index', {
     },
     data: function () {
         return {
-            c_house: '01',
-            check_date: '2020-03-08',
+            c_house: '',
+            check_date: '',
         }
     },
     mounted: function () {
@@ -944,9 +944,9 @@ var inventory = new Vue({
         return {
             isMounted: 0,
             login: {
-                comp_id: '1284',
-                user: '1',
-                pass: '1',
+                comp_id: '',
+                user: '',
+                pass: '',
             },
             setting: {
                 comp_id: '',
