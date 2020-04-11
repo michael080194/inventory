@@ -21,7 +21,7 @@
 
         <!-- Main View -->
         <f7-view id="main-view" main :stack-pages="true">
-            <f7-page color-theme="green" :class="{'opacity-0': !isMounted, 'opacity-1': isMounted}">
+            <f7-page color-theme="green" class="opacity-0" :style="{ opacity: isMounted }">
                 <f7-navbar title="雲端盤點系統"></f7-navbar>
 
                 <f7-toolbar tabbar labels bottom-md no-shadow inner>
@@ -129,12 +129,16 @@
 
             <f7-block-title>現有庫存列表：</f7-block-title>
             <f7-list media-list v-if="checkItems.length">
-                <f7-list-item
+                <f7-list-item swipeout
                     v-for="(item, key, index) in checkItems"
                     :title="item.c_partno"
                     :subtitle="item.c_descrp"
                     :text="item.check_qty + ' ' + item.c_unit + ' / ' + item.barcode + ' / ' + item.c_note"
                     :after="item.check_date">
+                    <f7-swipeout-actions left>
+                        <f7-swipeout-button color="blue" @click="currentCheckItemsUpdate(item.id)" close><f7-icon f7="compose"></f7-icon></f7-swipeout-button>
+                        <f7-swipeout-button color="red" @click="currentCheckItemsDelete(item.id, key)" close><f7-icon f7="trash"></f7-icon></f7-swipeout-button>
+                    </f7-swipeout-actions>
                 </f7-list-item>
             </f7-list>
             <f7-list media-list v-else>

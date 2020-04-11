@@ -12,8 +12,8 @@ Vue.component('page-index', {
     },
     data: function () {
         return {
-            c_house: '',
-            check_date: '',
+            c_house: '01',
+            check_date: '2020-03-08',
         }
     },
     mounted: function () {
@@ -173,6 +173,7 @@ Vue.component('page-check-inventory', {
             var self = this;
             var app = self.$f7;
 
+            console.log('Check items:');
             console.log(itemDetails);
             itemDetails.forEach(
                 function (item, index, array) {
@@ -189,6 +190,181 @@ Vue.component('page-check-inventory', {
                     // }
                 }
             );
+        },
+        currentCheckItemsDelete: function (check_id, arrayIndex) {
+            console.log('Delete Current Checked Inventory Item: ' + check_id);
+
+            var self = this;
+            var app = self.$f7;
+
+            app.dialog.create({
+                title: inventory.$options.framework7.name,
+                text: '確定要刪除這筆資料嗎？',
+                buttons: [
+                    {
+                        text: app.params.dialog.buttonCancel,
+                    },
+                    {
+                        text: app.params.dialog.buttonOk,
+                    },
+                ],
+                onClick(dialog, index) {
+                    if (index === 1) { // OK
+                        console.log('[Ok] Delete Current Checked Inventory Item: ' + check_id);
+
+                        var params = {
+                            op:       'deleteCheckData',
+                            comp_id:  self.comp_id,
+                            c_house:  self.c_house,
+                            user:     self.user,
+                            check_id: check_id,
+                        };
+
+                        app.request({
+                            url: API_SRC,
+                            method: 'POST',
+                            data: params,
+                            beforeSend: function (xhr) {
+                                app.preloader.show();
+                            },
+                            success: function (response, xhr, status) {
+                                response = JSON.parse(response);
+                                status = response['responseStatus'];
+                                if (status == 'OK') {
+                                    console.log('Delete Current Checked Inventory Item Success.');
+
+                                    // delete item in frontend
+                                    self.checkItems.splice(arrayIndex, 1);
+                                } else {
+                                    console.log('Delete Current Checked Inventory Item Failed.');
+                                    app.dialog.alert('資料輸入錯誤。');
+                                }
+                            },
+                            complete: function (xhr, status) {
+                                app.preloader.hide();
+                            },
+                            error: function (xhr, status) {
+                                console.log('Delete Current Checked Inventory Item Failed.');
+                                app.dialog.alert('系統出現非預期錯誤，請聯絡負責人員。');
+                            }
+                        });
+                    }
+                    else if (index === 0) { // Cancel
+                        console.log('[Cancel] Delete Current Checked Inventory Item: ' + check_id);
+                    }
+                },
+                destroyOnClose: true,
+            }).open();
+        },
+        currentCheckItemsUpdate: function (check_id) {
+            console.log('Update Current Checked Inventory Item: ' + check_id);
+
+            var self = this;
+            var app = self.$f7;
+
+            // find index of the target item
+            var targetIndex = 0;
+            self.checkItems.forEach(
+                function (item, index, array) {
+                    if (item.id == check_id)
+                        targetIndex = index;
+                }
+            );
+
+            var item = self.checkItems[targetIndex];
+
+            var dialog = app.dialog.create({
+                title: inventory.$options.framework7.name,
+                text: `${item.c_partno} <br> ${item.c_descrp} <br> ${item.check_qty + ' ' + item.c_unit + ' / ' + item.barcode + ' / ' + item.c_note}`,
+                content: `
+                    <div class="dialog-input-field item-input">
+                        <div class="item-input-wrap">
+                            <input type="number" name="update-check_qty" class="dialog-input" placeholder="修改產品數量">
+                        </div>
+                    </div>
+                    <div class="dialog-input-field item-input">
+                        <div class="item-input-wrap">
+                            <input type="text" name="update-c_note" class="dialog-input" placeholder="修改產品備註">
+                        </div>
+                    </div>`,
+                buttons: [
+                    {
+                        text: app.params.dialog.buttonCancel,
+                    },
+                    {
+                        text: app.params.dialog.buttonOk,
+                    },
+                ],
+                onClick(dialog, index) {
+                    if (index === 1) { // OK
+                        console.log('[Ok] Update Current Checked Inventory Item: ' + check_id);
+
+                        var check_qty_origin = item.check_qty,
+                            c_note_origin = (item.c_note == '(無備註)') ? null : item.c_note;
+
+                        var updateCheck_qty = dialog.$el.find('.dialog-input[name="update-check_qty"]').val(),
+                            updateC_note    = dialog.$el.find('.dialog-input[name="update-c_note"]').val();
+
+                        if (updateCheck_qty == '' && updateC_note == '') {
+                            console.log('Nothing Change.');
+                            return;
+                        }
+                        else {
+                            var params = {
+                                op:       'updateCheckData',
+                                comp_id:   self.comp_id,
+                                user:      self.user,
+                                c_house:   self.c_house,
+                                check_id:  check_id,
+                                check_qty: check_qty_origin,
+                                c_note:    c_note_origin,
+                            };
+
+                            if (updateCheck_qty != '') {
+                                self.$set(self.checkItems[targetIndex], 'check_qty', updateCheck_qty);
+                                params.check_qty = updateCheck_qty;
+                            }
+                            if (updateC_note != '') {
+                                self.$set(self.checkItems[targetIndex], 'c_note', updateC_note);
+                                params.c_note = updateC_note;
+                            }
+                        }
+
+                        app.request({
+                            url: API_SRC,
+                            method: 'POST',
+                            data: params,
+                            beforeSend: function (xhr) {
+                                app.preloader.show();
+                            },
+                            success: function (response, xhr, status) {
+                                response = JSON.parse(response);
+                                status = response['responseStatus'];
+                                if (status == 'OK') {
+                                    console.log('Update Current Checked Inventory Item Success.');
+                                } else {
+                                    console.log('Update Current Checked Inventory Item Failed.');
+                                    app.dialog.alert('資料輸入錯誤。');
+                                }
+                            },
+                            complete: function (xhr, status) {
+                                app.preloader.hide();
+                            },
+                            error: function (xhr, status) {
+                                console.log('Update Current Checked Inventory Item Failed.');
+                                app.dialog.alert('系統出現非預期錯誤，請聯絡負責人員。');
+                            }
+                        });
+                    }
+                    else if (index === 0) { // Cancel
+                        console.log('[Cancel] Update Current Inserted Inventory Item: ' + check_id);
+                    }
+                },
+                destroyOnClose: true,
+            }).open();
+
+            // focus on input while dialog open
+            dialog.$el.find('.dialog-input').eq(0).focus();
         },
     }
 });
@@ -766,11 +942,11 @@ var inventory = new Vue({
     },
     data: function () {
         return {
-            isMounted: false,
+            isMounted: 0,
             login: {
-                comp_id: '',
-                user: '',
-                pass: '',
+                comp_id: '1284',
+                user: '1',
+                pass: '1',
             },
             setting: {
                 comp_id: '',
@@ -787,7 +963,7 @@ var inventory = new Vue({
         document.getElementsByTagName('body')[0].style.animation = '2s fadeIn';
         setTimeout(function () {
             // 所有 DOM 渲染完成後才一次顯示出來
-            self.isMounted = true;
+            self.isMounted = 1;
         }, 2000);
 
         // 進到 app 後自動 focus on input
