@@ -217,7 +217,7 @@ function insertBySearchStock()
     $c_qty        = $_POST["c_qty"];      // 盤點數量
 
     global $db;
-    if (!$comp_id or !$barcode) {
+    if (!$comp_id or !$c_house or !$user) {
         $r   = array();
         $r['responseStatus']  = "FAIL";
         return json_encode($r, JSON_UNESCAPED_UNICODE);
@@ -382,7 +382,6 @@ function searchStock()
     $searchCondition .= ($c_partno != "") ? "AND  c_partno Like '%{$c_partno}%'" : "";
     $searchCondition .= ($c_descrp != "") ? "AND  c_descrp Like '%{$c_descrp}%'" : "";
     $sql =  "select * from `$tbl1`  WHERE " . $searchCondition;
-
     $result          = $db->kyc_sqlFetch_assoc($sql);
     $all = array();
     $count = 0;
