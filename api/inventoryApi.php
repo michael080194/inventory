@@ -217,7 +217,7 @@ function insertBySearchStock()
     $c_qty        = $_POST["c_qty"];      // 盤點數量
 
     global $db;
-    if (!$comp_id or !$c_house !$user) {
+    if (!$comp_id or !$c_house or !$user) {
         $r   = array();
         $r['responseStatus']  = "FAIL";
         return json_encode($r, JSON_UNESCAPED_UNICODE);
