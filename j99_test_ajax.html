@@ -70,11 +70,12 @@
           // var url1="http://localhost/php/inventory/api/inventoryApi.php";
           // test_login(); // 測試 login
           // test_insertByBarcode(); // 用 barcode 抓取產品資料 並 新增資料至 盤點異動檔
+          // test_insertBySearchStock(); // 查詢到資料後;將所選取到之資料儲存
+          test_insertByInputPartno(); // 儲存使用者 直接輸入產品編號及備註之資料
           // update_check_data(); // 更新盤點數量 by 盤點異動檔 的序號
           // delete_check_data(); // delete data by 盤點異動檔 的序號
           // list_check_data(); // 顯示 盤點異動檔 資料
-          search_stock(); // 查詢 現有庫存檔
-          // test_insertBySearchStock(); // 查詢到資料後;將所選取到之資料儲存
+          // search_stock(); // 查詢 現有庫存檔
         });
         function test_login(){
           var pass0 = {};
@@ -138,6 +139,81 @@
                 // $.each(product[0], function(key, value) {
                 //      console.log(key + ":" + value);
                 // });
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function test_insertBySearchStock(){
+          var pass0 = {};
+          pass0.op   = "insertBySearchStock";
+          pass0.comp_id  = "1284";
+          pass0.user     = "1"
+          pass0.c_house  = "01";
+          pass0.check_date  = "2020-02-24";
+          pass0.c_partno  = "ABC";
+          pass0.c_descrp  = "國際牌電視機";
+          pass0.c_unit    = "台";
+          pass0.barcode  = "471009";
+          pass0.c_qty    = 1;
+
+          $.ajax({
+            url: url1,
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                status= data1["responseStatus"];   // if  SUCCESS return content array
+                // alert(msg);
+                product= data1["responseArray"];   // if  SUCCESS return content array
+                console.log(product["insert_id"]); // 回傳回來該條碼之  新增至 盤點異動檔 的序號
+                console.log(product[0]["c_partno"]); // 回傳回來該條碼之 產品編號
+                console.log(product[0]["c_descrp"]); // 回傳回來該條碼之 產品說明
+                console.log(product[0]["c_unit"]);   // 回傳回來該條碼之 產品單位
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function test_insertByInputPartno(){
+          var pass0 = {};
+          pass0.op   = "insertByInputPartno";
+          pass0.comp_id  = "1284";
+          pass0.user     = "1"
+          pass0.c_house  = "01";
+          pass0.check_date  = "2020-03-08";
+          pass0.c_partno  = "NR-001";
+          pass0.c_descrp  = "國際牌電視機";
+          pass0.c_qty    = 1;
+
+          $.ajax({
+            url: url1,
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                status= data1["responseStatus"];   // if  SUCCESS return content array
+                // alert(msg);
+                product= data1["responseArray"];   // if  SUCCESS return content array
+                console.log(product["insert_id"]); // 回傳回來該條碼之  新增至 盤點異動檔 的序號
+                console.log(product[0]["c_partno"]); // 回傳回來該條碼之 產品編號
+                console.log(product[0]["c_note"]); // 回傳回來該條碼之 備註說明
               },
             complete:function(xhr, status) {
                 $('.loader').css('display','none');
@@ -275,45 +351,6 @@
                 } else {
                   console.log(data1["responseMessage"]); // 查不到資料
                 }
-              },
-            complete:function(xhr, status) {
-                $('.loader').css('display','none');
-              },
-            error:function(xhr, status) {
-
-              }
-          })
-        }
-
-        function test_insertBySearchStock(){
-          var pass0 = {};
-          pass0.op   = "insertBySearchStock";
-          pass0.comp_id  = "1284";
-          pass0.user     = "1"
-          pass0.c_house  = "01";
-          pass0.check_date  = "2020-02-24";
-          pass0.c_partno  = "ABC";
-          pass0.c_descrp  = "國際牌電視機";
-          pass0.c_unit    = "台";
-          pass0.barcode  = "471009";
-          pass0.c_qty    = 1;
-
-          $.ajax({
-            url: url1,
-            method:"POST",
-            data:pass0,
-            beforeSend:function(xhr) {
-
-              },
-            success:function(data, xhr, status) {
-                var data1 = JSON.parse(data);
-                status= data1["responseStatus"];   // if  SUCCESS return content array
-                // alert(msg);
-                product= data1["responseArray"];   // if  SUCCESS return content array
-                console.log(product["insert_id"]); // 回傳回來該條碼之  新增至 盤點異動檔 的序號
-                console.log(product[0]["c_partno"]); // 回傳回來該條碼之 產品編號
-                console.log(product[0]["c_descrp"]); // 回傳回來該條碼之 產品說明
-                console.log(product[0]["c_unit"]);   // 回傳回來該條碼之 產品單位
               },
             complete:function(xhr, status) {
                 $('.loader').css('display','none');
