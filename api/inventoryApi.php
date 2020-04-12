@@ -42,6 +42,12 @@ switch ($op) {
         // insert 一筆資料至盤點檔(inv_check);並回傳 新增 id 及 產品基本資料
         echo insertBySearchStock();
         break;
+    case 'insertByInputPartno':
+        // app 手機程式用
+        // 儲存使用者 直接輸入產品編號及備註之資料
+        // 並回傳 新增 id 及 產品基本資料
+        echo insertByInputPartno();
+        break;
     case 'listCheckData':
          // app 手機程式用
          // 顯示 公司別+倉庫別+盤點人員+盤點日期 之盤點資料(inv_check)
@@ -234,7 +240,7 @@ function insertBySearchStock()
     $sqlArr['check_user'] = $user;       // 盤點人員
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
     $sqlArr['barcode']    = $barcode;    // 條碼
-    $sqlArr['check_qty']  = $c_qty;      // 盤點人員
+    $sqlArr['check_qty']  = $c_qty;      // 盤點數量
     $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
     $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
 
@@ -244,6 +250,55 @@ function insertBySearchStock()
     $prods['barcode']=$barcode;
     $prods['c_descrp']=$c_descrp;
     $prods['c_unit']=$c_unit;
+    $all[] = $prods;
+
+    $all["insert_id"] = $insert_id;
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 儲存使用者 直接輸入產品編號及備註之資料
+# 並回傳 新增 id 及 產品基本資料
+#################################
+function insertByInputPartno()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $user         = $_POST["user"];       // 盤點人員
+    $check_date   = $_POST["check_date"]; // 盤點日期
+    $c_partno     = $_POST["c_partno"];   // 產品編號
+    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
+    $c_qty        = $_POST["c_qty"];      // 盤點數量
+
+    global $db;
+    if (!$comp_id or !$c_house or !$user) {
+        $r   = array();
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+
+    // 將盤點資料 新增至 盤點異動檔
+    $dt = new DateTime();
+    $tbl       = $comp_id . "_inv_check"; //盤點異動檔
+    $sqlArr    = array();
+    $sqlArr['comp_id']    = $comp_id;    // 公司別
+    $sqlArr['c_house']    = $c_house ;   // 倉庫別
+    $sqlArr['check_date'] = $check_date; // 盤點日期
+    $sqlArr['check_user'] = $user;       // 盤點人員
+    $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['check_qty']  = $c_qty;      // 盤點數量
+    $sqlArr['c_note']     = $c_descrp;   // 備註說明
+    $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
+    $insert_id = $db->kyc_insert($tbl, $sqlArr); // 取得新增資料的 id 值
+
+    $all = array();
+    $prods = array();
+    $prods['c_partno']=$c_partno;
+    $prods['c_note']=$c_descrp;
     $all[] = $prods;
 
     $all["insert_id"] = $insert_id;
