@@ -30,6 +30,10 @@ p {
     line-height: 20px !important;
 }
 
+.block-title-p:not(:first-child) {
+    margin-top: 16px;
+}
+
 .button {
     font-size: 18px !important;
     font-weight: bold !important;
@@ -76,4 +80,9 @@ p {
 .opacity-1 {
     opacity: 1;
     transition: .2s;
+}
+
+.md .tabbar-labels.toolbar-bottom-md a.link, .md .tabbar-labels.toolbar-bottom-md a.tab-link {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
