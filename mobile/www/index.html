@@ -73,6 +73,14 @@
                                 <f7-label>使用者密碼</f7-label>
                                 <f7-input type="password" name="s_pass" placeholder="請輸入使用者密碼" :value="setting.pass" @input="setting.pass=$event.target.value" autofocus clear-button></f7-input>
                             </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>倉庫別</f7-label>
+                                <f7-input type="text" name="s_c_house" placeholder="請輸入倉庫別" :value="setting.c_house" @input="setting.c_house=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
+                            <f7-list-item>
+                                <f7-label>盤點日期</f7-label>
+                                <f7-input type="date" name="s_check_date" placeholder="請輸入盤點日期" :value="setting.check_date" @input="setting.check_date=$event.target.value" autofocus clear-button></f7-input>
+                            </f7-list-item>
                         </f7-list>
                         <f7-block>
                             <f7-row>
