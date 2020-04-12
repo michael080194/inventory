@@ -9,21 +9,24 @@ Vue.component('page-index', {
     props: {
         comp_id: String,
         user: String,
-        c_house: String,
-        check_date: String,
     },
     data: function () {
         return {
-            // data
+            c_house: '',
+            check_date: '',
         }
     },
     mounted: function () {
-        var self = this;
 
-        if (self.c_house == '_KYC_NULL')    self.c_house    = '';
-        if (self.check_date == '_KYC_NULL') self.check_date = '';
-        document.querySelector('input[name="c_house"]').value = self.c_house;
-        document.querySelector('input[name="check_date"]').value = self.check_date;
+        console.log('Load Setting......');
+
+        var self = this;
+        if (window.localStorage.getItem('c_house'))
+            self.c_house = window.localStorage.getItem('c_house');
+        if (window.localStorage.getItem('check_date'))
+            self.check_date = window.localStorage.getItem('check_date');
+
+        console.log('Load Setting Success.');
 
         // 進到這個 template 後自動 focus on input
         setTimeout(function () {
@@ -927,7 +930,7 @@ var inventory = new Vue({
         // App routes
         routes: [
             {
-                path: '/page-index/:comp_id/:user/:c_house/:check_date',
+                path: '/page-index/:comp_id/:user',
                 component: 'page-index',
             },
             {
@@ -1083,16 +1086,7 @@ var inventory = new Vue({
                     comp_id:    self.login.comp_id,
                     user:       self.login.user,
                     pass:       self.login.pass,
-                    c_house:    self.setting.c_house,
-                    check_date: self.setting.check_date,
                 };
-
-                // set `c_house` && `check_date` to '_KYC_NULL' as null
-                // because unable to pass '' via route
-                if (params.c_house == '')
-                    params.c_house = '_KYC_NULL';
-                if (params.check_date == '')
-                    params.check_date = '_KYC_NULL';
 
                 app.request({
                     url: API_SRC,
@@ -1106,7 +1100,7 @@ var inventory = new Vue({
                         status = response['responseStatus'];
                         if (status == 'OK') {
                             console.log('User Login Success.');
-                            app.views.main.router.navigate(`/page-index/${params.comp_id}/${params.user}/${params.c_house}/${params.check_date}`);
+                            app.views.main.router.navigate(`/page-index/${params.comp_id}/${params.user}`);
                         } else {
                             console.log('User Login Failed.');
                             app.dialog.alert('資料輸入錯誤。');
