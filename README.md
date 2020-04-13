@@ -3,7 +3,10 @@
       再使用本系統開發之APP，使用手機將盤點資料上傳至雲端，
       由Web程式計算出盤盈盤虧，再匯出 Excel 檔
   *   產品資料須事先建立條碼(電器業可由機種編號直接代替條碼編號)
-  *   搭配無線藍芽讀碼機效果更佳
+  *   使用本APP，須將現有excel庫存檔上傳至雲端
+  *   盤點時可掃條碼或自行輸入產品編號；或查詢現有庫存資料之後，直接輸入盤點數量
+  *   電腦會依現有庫存和盤點數量，計算盤盈或盤虧，並匯出 Excel檔
+  *   掃描條碼方式可由手機照像機鏡頭，或搭配可攜式藍牙讀碼機效果更佳(例如漢印HS-M300)
   *   Android 手機可下載 apk ; iOS 直接執行 Web 端 程式
   *   支援多公司(分店)盤點
 
@@ -52,7 +55,8 @@
 <h2 id="cordova">開發工具--cordova專案 </h2>
 
     1.  批次檔範本(MAC版本) 放在 cordova-tool 資料夾
-    2.  請於 MAC 終端機執行 sudo sh create_inventory_android.sh ; 批次產生 cordova 專案 
+    2.  請於 MAC 終端機執行 sudo sh create_inventory_android.sh ; 批次產生 cordova 專案
+        (建立完成後，要將 inventory 資料夾 sharing & permmisions打開)
 
 <h2 id="other1">其他1 </h2>
 
