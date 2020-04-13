@@ -116,7 +116,8 @@ function deleteCheckData()
 #################################
 function deleteStockData()
 {
-    $comp_id      = $_POST["comp_id"];    // 公司別
+    // $comp_id      = $_POST["comp_id"];    // 公司別
+    $comp_id = $_SESSION["comp_id"];
     $c_house      = $_POST["c_house"];    // 倉庫別
     $check_date   = new DateTime($_POST["check_date"]); // 盤點檔上傳日期
     $check_date   = $check_date->format('Y-m-d H:i:s');
