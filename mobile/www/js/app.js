@@ -418,6 +418,60 @@ Vue.component('page-search-inventory', {
         },
     },
     methods: {
+        insertInventoryItemByPartno: function () {
+            var self = this;
+            var app = self.$f7;
+
+            if (self.c_partno == '') {
+                app.dialog.alert('請輸入產品編號。', function () {
+                    // 關閉提示框後自動 focus on input
+                    document.querySelector(`input[name="c_partno"]`).focus();
+                });
+            }
+            else {
+                var params = {
+                    op:        'insertByInputPartno',
+                    comp_id:    self.comp_id,
+                    user:       self.user,
+                    c_house:    self.c_house,
+                    check_date: self.check_date,
+                    c_partno:   self.c_partno,
+                    c_descrp:   self.c_descrp,
+                    c_qty:      1,
+                };
+
+                app.request({
+                    url: API_SRC,
+                    method: 'POST',
+                    data: params,
+                    beforeSend: function (xhr) {
+                        app.preloader.show();
+                    },
+                    success: function (response, xhr, status) {
+                        response = JSON.parse(response);
+                        status = response['responseStatus'];
+                        if (status == 'OK') {
+                            console.log('Insert Inventory Item By Partno Success.');
+
+                            response['responseArray'].time = self.getTimeCurrent;
+                            response['responseArray'].op = 'insertByInputPartno';
+                            self.routeBackToPageStartInventory(response['responseArray']);
+                            // var itemsDetails = response['responseArray'];
+                        } else {
+                            console.log('Insert Inventory Item By Partno Failed.');
+                            app.dialog.alert('系統出現非預期錯誤，請聯絡負責人員。');
+                        }
+                    },
+                    complete: function (xhr, status) {
+                        app.preloader.hide();
+                    },
+                    error: function (xhr, status) {
+                        console.log('Insert Inventory Item By Partno Failed.');
+                        app.dialog.alert('系統出現非預期錯誤，請聯絡負責人員。');
+                    }
+                });
+            }
+        },
         insertInventoryItemBySearchStock: function (arrayIndex) {
             console.log('Insert Inventory Item By Search Stock......');
 
@@ -453,6 +507,7 @@ Vue.component('page-search-inventory', {
                         console.log('Search Inventory Barcode By Partno Or Descrp Success.');
 
                         response['responseArray'].time = self.getTimeCurrent;
+                        response['responseArray'].op = 'insertBySearchStock';
                         self.routeBackToPageStartInventory(response['responseArray']);
                     } else {
                         console.log('Search Inventory Barcode By Partno Or Descrp Failed.');
@@ -478,16 +533,32 @@ Vue.component('page-search-inventory', {
             // 防止 `/` 造成 route 資料傳輸出錯
             data = data.replace(/&&slash;&/g, '/');
             data = JSON.parse(data);
-            var new_data_by_search = [
-                item['insert_id'],   // 建檔序號
-                item[0]['c_partno'], // 產品編號
-                item[0]['c_descrp'], // 產品名稱
-                1,                   // 盤點數量
-                item[0]['c_unit'],   // 單位
-                item[0]['barcode'],  // 條碼編號
-                '(無備註)',           // 備註
-                item['time']         // 新增時間 (僅顯示在前端，後端不會儲存)
-            ]
+
+            var new_data_by_search = [];
+            if (item['op'] == 'insertBySearchStock') {
+                new_data_by_search = [
+                    item['insert_id'],   // 建檔序號
+                    item[0]['c_partno'], // 產品編號
+                    item[0]['c_descrp'], // 產品名稱
+                    1,                   // 盤點數量
+                    item[0]['c_unit'],   // 單位
+                    item[0]['barcode'],  // 條碼編號
+                    '(無備註)',           // 備註
+                    item['time']         // 新增時間 (僅顯示在前端，後端不會儲存)
+                ];
+            }
+            else if (item['op'] == 'insertByInputPartno') {
+                new_data_by_search = [
+                    item['insert_id'],   // 建檔序號
+                    item[0]['c_partno'], // 產品編號
+                    '',                  // 產品名稱
+                    1,                   // 盤點數量
+                    '',                  // 單位
+                    '',                  // 條碼編號
+                    item[0]['c_note'],   // 備註
+                    item['time']         // 新增時間 (僅顯示在前端，後端不會儲存)
+                ];
+            }
             data.unshift(new_data_by_search); // unshift: 越晚新增的資料放在 array 的越前面
 
             var itemsDetails = JSON.stringify(data);
