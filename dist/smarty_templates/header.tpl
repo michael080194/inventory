@@ -36,6 +36,9 @@
                         <a class="nav-link" href="j00_stock_delete.php">資料刪除</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="j00_stock_app_download.php">APP 下載</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="j00_user.php">使用者建立</a>
                     </li>
                 </ul>
