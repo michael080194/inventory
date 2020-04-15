@@ -1048,13 +1048,13 @@ var inventory = new Vue({
         setTimeout(function () {
             // 所有 DOM 渲染完成後才一次顯示出來
             self.isMounted = 1;
-        }, 2000);
+        }, 500);
 
         // 進到 app 後自動 focus on input
         setTimeout(function () {
             document.querySelector('input[name="comp_id"]').focus();
             document.querySelector('input[name="comp_id"]').parentElement.parentElement.parentElement.classList.add("item-input-focused");
-        }, 2000);
+        }, 500);
 
         // 註冊 Android 手機返回鍵的 function
         document.addEventListener('backbutton', onBackKeyDown, false);
