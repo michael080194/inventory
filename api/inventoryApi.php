@@ -472,46 +472,62 @@ function stockExport()
     $stockData = [];
 
     // 抓資料
-    $tbl2 = "{$comp_id}_inv_check";  // 盤點異動檔
     $tbl1 = "{$comp_id}_inv_stock";  // 現有庫存檔
-    $searchCondition =  "a.comp_id = '$comp_id' AND a.c_house = '$c_house' AND ";
+    $tbl2 = "{$comp_id}_inv_check";  // 盤點異動檔
+    $searchCondition =  "a.comp_id = '$comp_id' AND a.c_house = '$c_house' AND a.check_date = '$check_date'";
+    $searchCondition1 =  "a.comp_id = '$comp_id' AND b.c_house = '$c_house' AND b.check_date = '$check_date'";
+
     $sql = "select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     LEFT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by barcode) AS b
-    ON a.barcode = b.barcode
-    UNION
+    from `$tbl2` group by c_partno) AS b
+    ON a.c_partno = b.c_partno  WHERE " . $searchCondition;
+    $sql .= "UNION
     select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     RIGHT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by barcode) AS b
-    ON a.barcode = b.barcode";
+    from `$tbl2` group by c_partno) AS b
+    ON a.c_partno = b.c_partno ";
+
     $result = $db->kyc_sqlFetch_assoc($sql);
 
     // 寫入excel
+    $wkseq = 1;
     foreach ($result as $checks) {
         $remark = "";
         if ($checks["w1barcode"] == NULL) {
             $remark = "電腦有帳；但沒有盤點資料。";
         }
-        if ($checks["barcode"] == NULL) {
+        if ($checks["c_partno"] == NULL) {
             $remark = "電腦沒有帳；但有盤點資料。";
         }
-        $checks["c_remark"] = $remark;
-        $checks["check_user"] = "user000";
+        if ($checks["c_partno"] == NULL) $checks["c_partno"] = "";
+        if ($checks["c_descrp"] == NULL) $checks["c_descrp"] = "";
+        if ($checks["barcode"] == NULL) $checks["barcode"] = "";
+        if ($checks["c_unit"] == NULL) $checks["c_unit"] = "";
+        if ($checks["c_qtyst"] == NULL) $checks["c_qtyst"] = "";
 
+        if ($checks["w1barcode"] == NULL) $checks["w1barcode"] = "";
+        if ($checks["check_total"] == NULL) $checks["check_total"] = "";
+        if ($checks["c_note"] == NULL) $checks["c_note"] = "";
+        if ($checks["w1partno"] == NULL) $checks["w1partno"] = "";
+        $checks["c_remark"] = $remark;
+        // $checks["check_user"] = "user000";
+
+        $c_seq        = $wkseq ;                 // 序號
         $c_partno     = $checks["c_partno"];     // 機種編號
         $barcode      = $checks["barcode"];      // 條碼編號
         $c_descrp     = $checks["c_descrp"];     // 產品名稱
         $c_unit       = $checks["c_unit"];       // 單位
         $c_qtyst      = $checks["c_qtyst"];      // 現有庫存
         $w1barcode    = $checks["w1barcode"];    // 盤點條碼
+        $w1partno     = $checks["w1partno"];     // 盤點產品
         $check_total  = $checks["check_total"];  // 盤點數量
         $c_qtyst_diff = $check_total - $c_qtyst; // 差額
         $c_note       = $checks["c_note"];       // 盤點說明
-        $check_user   = $checks["check_user"];   // 盤點人員
         $c_remark     = $checks["c_remark"];     // 註記
 
-        $tmp = [$c_partno, $barcode, $c_descrp, $c_unit, $c_qtyst, $w1barcode, $check_total, $c_qtyst_diff, $c_note, $check_user, $c_remark];
+        $tmp = [$c_seq, $c_partno, $barcode, $c_descrp, $c_unit, $c_qtyst, $w1barcode,  $w1partno,$check_total, $c_qtyst_diff, $c_note];
         array_push($stockData, $tmp);
+        $wkseq++;
     }
 
     $r["responseResult"] = $stockData;
