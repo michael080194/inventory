@@ -63,17 +63,18 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">機種編號</th>
+                        <th scope="col">序號</th>
+                        <th scope="col">產品編號</th>
                         <th scope="col">條碼編號</th>
                         <th scope="col">產品名稱</th>
                         <th scope="col">單位</th>
                         <th scope="col">現有庫存</th>
                         <th scope="col">盤點條碼</th>
+                        <th scope="col">盤點產品</th>
                         <th scope="col">盤點數量</th>
                         <th scope="col">差額</th>
                         <th scope="col">盤點說明</th>
-                        <th scope="col">盤點人員</th>
-                        <th scope="col">註記</th>
+                        <!-- <th scope="col">註記</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -150,6 +151,7 @@
                     let stockDataArray = response['responseResult'];
                     let content = '';
                     $.each(stockDataArray, function (index, stockDataRow) {
+                        console.log(stockDataRow);
                         content += '<tr>';
                         $.each(stockDataRow, function (index, stockData) {
                             content += '<td>' + stockData + '</td>';
