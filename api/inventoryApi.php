@@ -330,12 +330,15 @@ function listCheckData()
     $searchCondition =  "a.comp_id = '{$comp_id}' AND a.c_house = '{$c_house}' AND ";
     $searchCondition .= "a.check_user = '{$user}' AND a.check_date = '{$check_date}'";
 
-    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition . " order by a.create_date DESC";
+    // $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition . " order by a.create_date DESC";
+
+    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b  ON a.c_partno = b.c_partno WHERE " . $searchCondition . " order by a.create_date DESC";
 
     $result          = $db->kyc_sqlFetch_assoc($sql);
     $r   = array();
     $all = array();
     foreach ($result as $prods) {
+        if($prods["barcode"] == NULL) $prods["barcode"] = "";
         $all[] = $prods;
     }
     $r['responseStatus']  = "OK";
