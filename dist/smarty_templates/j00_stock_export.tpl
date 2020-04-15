@@ -55,28 +55,31 @@
         <div class="alert alert-text" role="alert"></div>
 
         <div class="form-group">
-            <button type="submit" class="btn btn-main mt-3">匯出</button>
+            <button type="submit" class="btn btn-main mt-3 mr-3">匯出</button>
+            <span id="btn-download-stock" style="display: none;"></span>
         </div>
 
-        <table class="table table-striped" style="display: none">
-            <thead>
-                <tr>
-                    <th scope="col">機種編號</th>
-                    <th scope="col">條碼編號</th>
-                    <th scope="col">產品名稱</th>
-                    <th scope="col">單位</th>
-                    <th scope="col">現有庫存</th>
-                    <th scope="col">盤點條碼</th>
-                    <th scope="col">盤點數量</th>
-                    <th scope="col">差額</th>
-                    <th scope="col">盤點說明</th>
-                    <th scope="col">盤點人員</th>
-                    <th scope="col">註記</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div id="export-data-table" class="table-responsive" style="display: none">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">機種編號</th>
+                        <th scope="col">條碼編號</th>
+                        <th scope="col">產品名稱</th>
+                        <th scope="col">單位</th>
+                        <th scope="col">現有庫存</th>
+                        <th scope="col">盤點條碼</th>
+                        <th scope="col">盤點數量</th>
+                        <th scope="col">差額</th>
+                        <th scope="col">盤點說明</th>
+                        <th scope="col">盤點人員</th>
+                        <th scope="col">註記</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
 
         <div class="download-stock-file d-none"></div>
     </form>
@@ -89,6 +92,10 @@
 
 <!-- Bootstrap datetimepicker 4.17.47 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Table CSV Exporter -->
+<!-- Reference: https://www.youtube.com/watch?v=cpHCv3gbPuk -->
+<script src="/inventory/dist/js/table-csv-exporter.js"></script>
 
 <!-- Custom form validations -->
 <script>
@@ -120,10 +127,13 @@
     })();
 
     function kyc_stock_export() {
+        $('#export-data-table').hide();
+        $('table tbody').html('');
+
 		let form = $('#form-stock-excel');
 		var url1 = "/inventory/api/inventoryApi.php";
 		var pass0 = {};
-		pass0.op = form.find('input[name="op"]').val();
+		pass0.op = form.find('input[name="op"]').val(); // `stockExport`
 		pass0.c_house = form.find('input[name="c_house"]').val();
 		pass0.check_date = form.find('input[name="check_date"]').val();
 
@@ -147,25 +157,11 @@
                         content += '</td>';
                     });
                     $('table tbody').html(content);
-                    $('table').show();
+                    $('#export-data-table').show();
                     $('.loader').css('display', 'none');
-                    return;
 
-                    let cssAlertColor = 'alert-danger';
-                    let msg = '系統出現非預期錯誤，請聯絡負責人員。';
-                    if (response == '[]') {
-                        // 若成功產生盤點結果明細表，則自動下載後，刪除該檔案，再停止loader；
-                        form.find('button[type="submit"]').addClass('disabled');
-                        cssAlertColor = 'alert-success';
-                        msg = '匯出成功，等待下載......';
-                        kyc_stock_download_exported_data(pass0.c_house, pass0.check_date);
-                    }
-                    else {
-                        // 若失敗則直接停止loader
-                        $('.loader').css('display', 'none');
-                    }
-                    $('.alert-text').addClass(cssAlertColor).text(msg);
-                    $('.alert-text').show();
+                    $('#btn-download-stock').html(`<button type="button" class="btn btn-main mt-3 mr-3" onclick="downloadStockData('${pass0.c_house}', '${pass0.check_date}')">下載</button>`)
+                    $('#btn-download-stock').show();
                 }, 1000);
             },
             error: function(xhr, status) {
@@ -180,46 +176,21 @@
         });
     }
 
-    function kyc_stock_download_exported_data(c_house, check_date) {
-        let filename = `${check_date}_${c_house}_盤點結果明細表.csv`;
-        setTimeout(function () {
-            let link = document.createElement('a');
-            link.href = filename;
-            link.download = filename;
-            document.querySelector('.download-stock-file').appendChild(link);
-            link.click();
+    function downloadStockData (c_house, check_date) {
+        const dataTable = document.getElementsByClassName('table table-striped')[0];
+        const exporter = new TableCSVExporter(dataTable);
+        const csvOutput = '\uFEFF' + exporter.convertToCSV(); // '\uFEFF' prevent chinese strings from wrong words
+        const csvBlob = new Blob([csvOutput], { type: 'text/csv; charset=utf-8' });
+        const blobUrl = URL.createObjectURL(csvBlob);
+        const anchorElement = document.createElement('a');
 
-            var url1 = "/inventory/api/inventoryApi.php";
-            var pass0 = {};
-            pass0.op = 'stockExportFileDelete';
-            pass0.filename = filename;
-            $.ajax({
-                url: url1,
-                method: 'POST',
-                data: pass0,
-                complete: function (xhr, status) {
-                    setTimeout(function () {
-                        $('.loader').css('display', 'none');
-                    }, 1000);
-                },
-                success: function(response, xhr, status) {
-                    response = JSON.parse(response);
-                    status = response['responseStatus'];
-                    if (status == 'OK') {
-                        console.log(`File delete success in backend: ${filename}`);
-                        let form = $('#form-stock-excel');
-                        form.find('button[type="submit"]').removeClass('disabled');
-                    }
-                    else {
-                        console.log(`File delete failed in backend: ${filename}`);
-                    }
-                },
-                error: function(xhr, status) {
-                    // `status` will return 'error'
-                    console.log('xhr: ', xhr);
-                    console.log('Something went wrong......');
-                }
-            });
-        }, 1500);
+        anchorElement.href = blobUrl;
+        anchorElement.download = `${c_house}_${check_date}_盤點結果明細表.csv`;
+        anchorElement.click();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 500);
     }
+
 </script>

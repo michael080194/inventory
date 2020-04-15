@@ -69,9 +69,6 @@ switch ($op) {
         // 匯出 Excel 檔
         echo stockExport();
         break;
-    case 'stockExportFileDelete':
-        echo stockExportFileDelete();
-        break;
     case 'stockImport':
         // 網頁版程式用
         // 匯入 Excel 檔
@@ -518,111 +515,6 @@ function stockExport()
     }
 
     $r["responseResult"] = $stockData;
-
-// 匯出並下載
-/*
-    require("../plugin/PHPExcel/IOFactory.php");
-    $objPHPExcel = new PHPExcel();
-
-    // 設定excel
-    $excelRow = 1;
-    $objPHPExcel->getActiveSheet()
-        ->setCellValue("A$excelRow", "公司別：$comp_id")
-        ->setCellValue("B$excelRow", "倉庫別：$c_house")
-        ->setCellValue("C$excelRow", "盤點日期：$check_date");
-
-    $excelRow++;
-    $objPHPExcel->getActiveSheet()
-        ->setCellValue("A$excelRow", "機種編號")
-        ->setCellValue("B$excelRow", "條碼編號")
-        ->setCellValue("C$excelRow", "產品名稱")
-        ->setCellValue("D$excelRow", "單位")
-        ->setCellValue("E$excelRow", "現有庫存")
-        ->setCellValue("F$excelRow", "盤點條碼")
-        ->setCellValue("G$excelRow", "盤點數量")
-        ->setCellValue("H$excelRow", "差額")
-        ->setCellValue("I$excelRow", "盤點說明")
-        ->setCellValue("J$excelRow", "註記");
-
-    // 抓資料
-    $tbl2 = "{$comp_id}_inv_check";  // 盤點異動檔
-    $tbl1 = "{$comp_id}_inv_stock";  // 現有庫存檔
-    $searchCondition =  "a.comp_id = '$comp_id' AND a.c_house = '$c_house' AND ";
-    $sql = "select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
-    LEFT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by barcode) AS b
-    ON a.barcode = b.barcode
-    UNION
-    select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
-    RIGHT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by barcode) AS b
-    ON a.barcode = b.barcode";
-    $result = $db->kyc_sqlFetch_assoc($sql);
-
-    // 寫入excel
-    foreach ($result as $checks) {
-        $remark = "";
-        if ($checks["w1barcode"] == NULL) {
-            $remark = "電腦有帳；但沒有盤點資料。";
-        }
-        if ($checks["barcode"] == NULL) {
-            $remark = "電腦沒有帳；但有盤點資料。";
-        }
-        $checks["c_remark"] = $remark;
-        $checks["check_user"] = "user000";
-
-        $c_partno     = $checks["c_partno"];     // 機種編號
-        $barcode      = $checks["barcode"];      // 條碼編號
-        $c_descrp     = $checks["c_descrp"];     // 產品名稱
-        $c_unit       = $checks["c_unit"];       // 單位
-        $c_qtyst      = $checks["c_qtyst"];      // 現有庫存
-        $w1barcode    = $checks["w1barcode"];    // 盤點條碼
-        $check_total  = $checks["check_total"];  // 盤點數量
-        $c_qtyst_diff = $check_total - $c_qtyst; // 差額
-        $c_note       = $checks["c_note"];       // 盤點說明
-        $check_user   = $checks["check_user"];   // 盤點人員
-        $c_remark     = $checks["c_remark"];     // 註記
-
-        $excelRow++;
-        $objPHPExcel->getActiveSheet()
-            ->setCellValue("A$excelRow", $c_partno)
-            ->setCellValue("B$excelRow", $barcode)
-            ->setCellValue("C$excelRow", $c_descrp)
-            ->setCellValue("D$excelRow", $c_unit)
-            ->setCellValue("E$excelRow", $c_qtyst)
-            ->setCellValue("F$excelRow", $w1barcode)
-            ->setCellValue("G$excelRow", $check_total)
-            ->setCellValue("H$excelRow", $c_qtyst_diff)
-            ->setCellValue("I$excelRow", $c_note)
-            ->setCellValue("J$excelRow", $check_user)
-            ->setCellValue("K$excelRow", $c_remark);
-        //     ->setCellValue("D$excelRow", PHPExcel_Shared_Date::stringToExcel($rec["date_of_birth"]))
-        //     ->setCellValue("E$excelRow", $rec["salary"]);
-        // $objPHPExcel->getActiveSheet()->getStyle("D" . $excelRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_XLSX15);
-        // $objPHPExcel->getActiveSheet()->getStyle("E" . $excelRow)->getNumberFormat()->setFormatCode("£#,##0.00");
-    }
-
-    // 輸出excel
-    // 前提：允許 extensions `php_xmlrpc.dll`, `php_xsl.dll`, `php_zip.dll`
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "CSV");
-    $objWriter->save("../dist/php/{$check_date}_{$c_house}_盤點結果明細表.csv");
-*/
-    return json_encode($r, JSON_UNESCAPED_UNICODE);
-}
-################################
-# 刪除匯出的盤點明細表(省空間)
-#################################
-function stockExportFileDelete()
-{
-    $r = array();
-    $filename = $_POST["filename"];
-
-    if (!unlink("../dist/php/$filename")) {
-        $r["responseStatus"] = "FAIL";
-    }
-    else {
-        $r["responseStatus"] = "OK";
-    }
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
