@@ -1,5 +1,5 @@
-var API_SRC = '../../api/inventoryApi.php';
-
+// var API_SRC = '../../api/inventoryApi.php';
+var API_SRC = 'http://michael1.cp35.secserverpros.com/inventory/api/inventoryApi.php';
 // Init F7 Vue Plugin
 Vue.use(Framework7Vue, Framework7)
 
