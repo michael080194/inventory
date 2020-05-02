@@ -31,6 +31,16 @@ switch ($op) {
         // 刪除 盤點庫存檔(inv_stock)整批資料 資料 by 公司別+倉庫別+盤點檔上傳日期
         echo deleteStockData();
         break;
+    case 'checkStockDataExist':
+        // 網頁版程式用
+        // 檢查 盤點庫存檔(inv_stock)是否重複 by 公司別+倉庫別+盤點檔上傳日期
+        echo checkStockDataExist();
+        break;
+    case 'listStockDataSummary':
+        // 網頁版程式用
+        // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+        echo listStockDataSummary();
+        break;
     case 'insertByBarcode':
         // app 手機程式用
         // 盤點人員掃條碼後;insert 一筆資料至盤點檔(inv_check);並回傳 新增 id 及 產品基本資料
@@ -74,11 +84,111 @@ switch ($op) {
         // 匯入 Excel 檔
         echo stockImport();
         break;
+    case 'gatherBarcode': // 收集條碼 暫時不使用 2020-05-01
+        // app 手機程式用
+        // 儲存使用者  輸入 產品編號+產品說明+條碼編號
+        // 並回傳 新增 id
+        echo gatherBarcode();
+        break;
     default:
         $r                   = array();
         $r['responseStatus'] = "FAIL";
         echo json_encode($r, JSON_UNESCAPED_UNICODE);
         break;
+}
+################################
+# 儲存使用者  輸入 產品編號+產品說明+條碼編號
+# 並回傳 id 及 產品基本資料
+#################################
+function gatherBarcode()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_partno     = $_POST["c_partno"];   // 產品編號
+    $c_descrp     = $_POST["c_descrp"];   // 產品名稱
+    $barcode      = $_POST["barcode"];    // 條碼編號
+
+    global $db;
+    if (!$comp_id or !$c_partno or !$barcode) {
+        $r   = array();
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $type = "";
+    $id=0;
+    if(isset($_POST["id"])){
+       $type = "ADD";
+       $id=$_POST["id"];
+    }
+    // 將盤點資料 新增至 盤點異動檔
+    $tbl       = $comp_id . "_inv_gathe_barcode"; // 條碼收集檔
+    $sqlArr    = array();
+    if($type != "ADD"){
+       $sqlArr['id']      = $id;        // 修改的 id
+    }
+    $sqlArr['c_type']     = $type;       // 新增或修改
+    $sqlArr['comp_id']    = $comp_id;    // 公司別
+    $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['c_descrp']   = $c_descrp;   // 產品名稱
+    $sqlArr['barcode']    = $barcode;    // 條碼編號
+
+    $insert_id = $db->kyc_sqlReplace($tbl, $sqlArr); // 取得新增資料的 id 值
+
+    $all = array();
+
+    if($type == "ADD"){
+       $all["insert_id"]     = $insert_id;
+    } else {
+       $all["insert_id"]     = $id;
+    }
+
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+    $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 檢查 盤點庫存檔(inv_stock)是否重複 by 公司別+倉庫別+盤點檔上傳日期
+#################################
+function checkStockDataExist()
+{
+    global $db;
+    $r   = array();
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = $check_date->format('Y-m-d H:i:s');
+
+
+
+    if (!$comp_id or !$c_house or !$check_date) {
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl1             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND check_date = '{$check_date}'";
+
+    $sql =  "select * from `$tbl1`  WHERE " . $searchCondition;
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+    $all = array();
+    $count = 0;
+    foreach ($result as $prods) {
+        $all[] = $prods;
+        $count ++;
+    }
+    if($count == 0){
+        $r['responseStatus']  = "notExist";
+        $r['responseMessage'] = "資料不重複";
+    } else {
+        $r['responseStatus']  = "exist";
+        $r['responseMessage'] = "資料重複";
+        $r['responseArray']   = $all;
+    }
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ###############################
 # 刪除 盤點異動檔 資料
@@ -341,6 +451,44 @@ function listCheckData()
     $r['responseStatus']  = "OK";
     $r['responseMessage'] = "";
     $r['responseArray']   = $all;
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+#################################
+function listStockDataSummary()
+{
+    global $db;
+    $r   = array();
+    $comp_id      = $_POST["comp_id"];    // 公司別
+
+    if (!$comp_id) {
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl1             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition =  "comp_id = '{$comp_id}' ";
+
+    $sql =  "select distinct comp_id , c_house , check_date from `$tbl1`  WHERE " . $searchCondition;
+    // $sql =  "select distinct  comp_id , c_house , check_date from `$tbl1`  " ;
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+    $all = array();
+    $count = 0;
+    foreach ($result as $datas) {
+        $all[] = $datas;
+        $count ++;
+    }
+    if($count == 0){
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "查不到資料";
+    } else {
+        $r['responseStatus']  = "OK";
+        $r['responseMessage'] = "";
+        $r['responseArray']   = $all;
+    }
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
