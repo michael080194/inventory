@@ -75,6 +75,7 @@ form.needs-validation input {
 }
 
 form.needs-validation input:focus,
+form.needs-validation select:focus,
 .custom-file-input:focus~.custom-file-label {
     border-color: var(--color);
     box-shadow: 0 0 0 .2rem rgba(40, 167, 69, .25);
