@@ -155,7 +155,7 @@ function checkStockDataExist()
 {
     global $db;
     $r   = array();
-    $comp_id      = $_POST["comp_id"];    // 公司別
+    $comp_id      = $_SESSION["comp_id"];    // 公司別
     $c_house      = $_POST["c_house"];    // 倉庫別
     $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
     $check_date   = $check_date->format('Y-m-d H:i:s');

@@ -103,13 +103,50 @@
                         event.stopPropagation();
                     } else {
                         event.preventDefault();
-                        kyc_stock_import(form);
+                        check_stock_data_exist(form);
                     }
                     form.classList.add('was-validated');
                 }, false);
             });
         }, false);
     })();
+
+    function check_stock_data_exist(form) {
+        var url1 = "/inventory/api/inventoryApi.php";
+        var pass0 = {};
+        pass0.op = "checkStockDataExist";
+        pass0.check_date = $('#form-stock-excel input[name="check_date"]').val();
+        pass0.c_house = $('#form-stock-excel input[name="c_house"]').val();
+
+        $.ajax({
+            url: url1,
+            method: "POST",
+            data: pass0,
+            beforeSend: function (xhr) {
+                $('.loader').css('display', 'flex');
+            },
+            success: function (response, xhr, status) {
+                response = JSON.parse(response);
+                status = response["responseStatus"]; // if  SUCCESS return content array
+                if (status == "notExist") { // 資料不重複
+                    kyc_stock_import(form);
+                }
+                else {
+                    $('.alert-text').addClass('alert-danger').text('這個時間的這個倉庫別的庫存已經存在了，所以無法匯入。');
+                    $('.alert-text').show();
+                }
+            },
+            complete: function (xhr, status) {
+                $('.loader').css('display', 'none');
+            },
+            error: function (xhr, status) {
+                // `status` will return 'error'
+                console.log('xhr: ', xhr);
+                $('.alert-text').addClass('alert-danger').text('系統出現非預期錯誤，請聯絡負責人員。');
+                $('.alert-text').show();
+            }
+        })
+    }
 
     function kyc_stock_import(form) {
 		var url1 = "/inventory/api/inventoryApi.php";
