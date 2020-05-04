@@ -14,30 +14,22 @@ Vue.component('page-index', {
         return {
             c_house: '',
             check_date: '',
+            c_houseAndCheck_date: '',
+            optionsOfC_houseAndCheck_date: '',
         }
     },
     mounted: function () {
-
-        console.log('Load Setting......');
-
-        var self = this;
-        if (window.localStorage.getItem('c_house'))
-            self.c_house = window.localStorage.getItem('c_house');
-        if (window.localStorage.getItem('check_date'))
-            self.check_date = window.localStorage.getItem('check_date');
-
-        console.log('Load Setting Success.');
-
+        this.listStockDataSummary();
         // 進到這個 template 後自動 focus on input
         setTimeout(function () {
-            document.querySelector('input[name="c_house"]').focus();
-            document.querySelector('input[name="c_house"]').parentElement.parentElement.parentElement.classList.add("item-input-focused");
+            document.querySelector('select[name="c_houseAndCheck_date"]').focus();
+            document.querySelector('select[name="c_houseAndCheck_date"]').parentElement.parentElement.parentElement.classList.add("item-input-focused");
         }, 0);
     },
     computed: {
         title: function () {
             return `你好，${ this.user } (user) / ${ this.comp_id } (comp_id)`;
-        }
+        },
     },
     methods: {
         checkInventory: function () {
@@ -76,6 +68,52 @@ Vue.component('page-index', {
             else {
                 return 'ok';
             }
+        },
+        listStockDataSummary: function () {
+            console.log('List Stock Data Summary......');
+
+            var self = this;
+            var app = self.$f7;
+
+            var params = {
+                op: "listStockDataSummary",
+                comp_id: self.comp_id,
+            };
+
+            app.request({
+                url: API_SRC,
+                method: "POST",
+                data: params,
+                beforeSend: function (xhr) {
+                    app.preloader.show();
+                },
+                success: function (response, xhr, status) {
+                    response = JSON.parse(response);
+                    console.log('response:', response);
+                    msg = response["responseStatus"]; // if SUCCESS return content array
+
+                    if (msg == "OK") {
+                        // render `c_house` && `check_date` to select options
+                        self.optionsOfC_houseAndCheck_date = response["responseArray"];
+                    }
+                    app.preloader.hide();
+                },
+                error: function (xhr, status) {
+                    // `status` will return 'error'
+                    console.log('xhr: ', xhr);
+                    app.preloader.hide();
+                    app.dialog.alert('系統出現非預期錯誤，請聯絡負責人員。');
+                }
+            })
+        },
+        loadDataToC_houseAndCheck_date: function () {
+            console.log('Load Data To `c_house` && `check_date`');
+
+            var self = this;
+
+            var optionValue = self.c_houseAndCheck_date;
+            self.c_house = optionValue.split(':')[0];
+            self.check_date = optionValue.split(':')[1];
         },
         startInventory: function () {
             console.log('Start Inventory......');
@@ -1034,8 +1072,6 @@ var inventory = new Vue({
                 comp_id: '',
                 user: '',
                 pass: '',
-                c_house: '',
-                check_date: '',
             },
         }
     },
@@ -1104,12 +1140,6 @@ var inventory = new Vue({
             if (window.localStorage.getItem('pass')) {
                 self.login.pass = window.localStorage.getItem('pass');
                 self.setting.pass = window.localStorage.getItem('pass');
-            }
-            if (window.localStorage.getItem('c_house')) {
-                self.setting.c_house = window.localStorage.getItem('c_house');
-            }
-            if (window.localStorage.getItem('check_date')) {
-                self.setting.check_date = window.localStorage.getItem('check_date');
             }
 
             console.log('Load Setting Success.');
@@ -1196,8 +1226,6 @@ var inventory = new Vue({
             window.localStorage.setItem('comp_id', self.setting.comp_id);
             window.localStorage.setItem('user', self.setting.user);
             window.localStorage.setItem('pass', self.setting.pass);
-            window.localStorage.setItem('c_house', self.setting.c_house);
-            window.localStorage.setItem('check_date', self.setting.check_date);
 
             app.dialog.alert('預設資訊設定完成。');
         },

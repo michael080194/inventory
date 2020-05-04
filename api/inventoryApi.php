@@ -461,7 +461,7 @@ function listStockDataSummary()
 {
     global $db;
     $r   = array();
-    $comp_id      = $_SESSION["comp_id"];    // 公司別
+    $comp_id = (isset($_SESSION["comp_id"])) ? $_SESSION["comp_id"] : $_POST["comp_id"];    // 公司別
 
     if (!$comp_id) {
         $r['responseStatus']  = "FAIL";
