@@ -140,12 +140,13 @@
 				$('.loader').css('display', 'flex');
 			},
             success: function(response, xhr, status) {
+                // console.log(response);
                 setTimeout(function () {
                     response = JSON.parse(response);
                     let stockDataArray = response['responseResult'];
                     let content = '';
                     $.each(stockDataArray, function (index, stockDataRow) {
-                        console.log(stockDataRow);
+                        // console.log(stockDataRow);
                         content += '<tr>';
                         $.each(stockDataRow, function (index, stockData) {
                             content += '<td>' + stockData + '</td>';
