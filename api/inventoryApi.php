@@ -236,10 +236,15 @@ function deleteStockData()
         return json_encode($r, JSON_UNESCAPED_UNICODE);
     }
 
-    $tbl             = $comp_id . "_inv_stock"; // 盤點庫存檔
+    $tbl             = $comp_id . "_inv_stock"; // 現有庫存檔
     $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
     $deleteCondition .= "check_date = '{$check_date}' ";
 
+    $db->kyc_sqlDelete($tbl, $deleteCondition);
+
+    $tbl             = $comp_id . "_inv_check"; // 盤點明細檔
+    $deleteCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
+    $deleteCondition .= "check_date = '{$check_date}' ";
     $db->kyc_sqlDelete($tbl, $deleteCondition);
 
     $r['responseStatus']  = "OK";
@@ -623,16 +628,16 @@ function stockExport()
     $tbl1 = "{$comp_id}_inv_stock";  // 現有庫存檔
     $tbl2 = "{$comp_id}_inv_check";  // 盤點異動檔
     $searchCondition =  "a.comp_id = '$comp_id' AND a.c_house = '$c_house' AND a.check_date = '$check_date'";
-    $searchCondition1 =  "a.comp_id = '$comp_id' AND b.c_house = '$c_house' AND b.check_date = '$check_date'";
+    $searchCondition1 =  "comp_id = '$comp_id' AND c_house = '$c_house' AND check_date = '$check_date'";
 
     $sql = "select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     LEFT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
     from `$tbl2` group by c_partno) AS b
     ON a.c_partno = b.c_partno  WHERE " . $searchCondition;
-    $sql .= "UNION
+    $sql .= " UNION
     select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     RIGHT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by c_partno) AS b
+    from `$tbl2` WHERE {$searchCondition1} group by c_partno) AS b
     ON a.c_partno = b.c_partno ";
 
     $result = $db->kyc_sqlFetch_assoc($sql);
