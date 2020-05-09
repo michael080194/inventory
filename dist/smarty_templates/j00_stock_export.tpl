@@ -34,13 +34,13 @@
             <div class="col-sm-12">
                 <div class="form-group">
                     <select class="form-control list-stock-data-summary" onchange="load_data_to_hidden_input()" autofocus required>
-                        <option value="" disabled selected>請選擇倉庫別和盤點日期</option>
+                        <option value="" disabled selected>請選擇倉別和庫存上傳日</option>
                     </select>
-                    <div class="invalid-feedback">請選擇倉庫別和盤點日期</div>
+                    <div class="invalid-feedback">請選擇倉別和庫存上傳日</div>
                 </div>
             </div>
             <input type="hidden" name="c_house" class="form-control" placeholder="倉庫別" title="倉庫別" autofocus required>
-            <input type="hidden" name="check_date" class="form-control" placeholder="盤點日期" title="盤點日期" autofocus required>
+            <input type="hidden" name="check_date" class="form-control" placeholder="庫存上傳日" title="庫存上傳日" autofocus required>
         </div>
 
         <div class="alert alert-text" role="alert"></div>

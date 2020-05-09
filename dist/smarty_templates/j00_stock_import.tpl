@@ -41,7 +41,7 @@
             <div class="col-sm-6">
                 <div class="form-group">
                     <div class="input-group date datetimepicker">
-                        <input type="text" name="check_date" class="form-control" placeholder="盤點日期" title="盤點日期" autofocus required>
+                        <input type="text" name="check_date" class="form-control" placeholder="庫存上傳日" title="庫存上傳日" autofocus required>
                         <div class="input-group-append">
                             <span class="input-group-addon">
                                 <span class="far fa-calendar-alt"></span>
