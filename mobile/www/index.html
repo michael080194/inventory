@@ -34,7 +34,7 @@
                     <f7-tab id="tab-about">
                         <f7-block-title>關於 APP</f7-block-title>
                         <f7-list>
-                            <f7-list-item title="APP 版本" badge="1.1.0"></f7-list-item>
+                            <f7-list-item title="APP 版本" badge="1.3.0"></f7-list-item>
                             <f7-list-item title="開發設計" badge="冠宇資訊有限公司"></f7-list-item>
                             <f7-list-item title="程式名稱" badge="雲端盤點系統"></f7-list-item>
                             <f7-list-item title="Cordova" badge="7"></f7-list-item>
@@ -141,7 +141,7 @@
     <template id="page-check-inventory">
         <f7-page color-theme="green">
             <f7-navbar title="盤點列表" back-link="Back"></f7-navbar>
-            <f7-block-title class="block-title-p">倉庫別：{{ c_house }} / {{ user }} </f7-block-title>
+            <f7-block-title class="block-title-p">倉別：{{ c_house }} / {{ user }} </f7-block-title>
 
             <f7-list media-list v-if="checkItems.length">
                 <f7-list-item swipeout
@@ -167,8 +167,8 @@
         <f7-page color-theme="green">
             <f7-navbar title="搜尋產品條碼" back-link="Back"></f7-navbar>
 
-            <f7-block-title class="block-title-p">倉庫別：{{ c_house }}</f7-block-title>
-            <f7-block-title class="block-title-p">庫存上傳日期：{{ check_date }}</f7-block-title>
+            <f7-block-title class="block-title-p">倉別：{{ c_house }}</f7-block-title>
+            <f7-block-title class="block-title-p">庫存上傳日：{{ check_date }}</f7-block-title>
 
             <f7-block-title>搜尋條件：</f7-block-title>
             <f7-list no-hairlines-md>
@@ -216,8 +216,8 @@
                 </f7-nav-right>
             </f7-navbar>
 
-            <f7-block-title class="block-title-p">倉庫別：{{ c_house }}</f7-block-title>
-            <f7-block-title class="block-title-p">庫存上傳日期：{{ check_date }}</f7-block-title>
+            <f7-block-title class="block-title-p">倉別：{{ c_house }}</f7-block-title>
+            <f7-block-title class="block-title-p">庫存上傳日：{{ check_date }}</f7-block-title>
 
             <f7-block>
                 <f7-row no-gap style="align-items: center;">
