@@ -41,6 +41,16 @@ switch ($op) {
         // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
         echo listStockDataSummary();
         break;
+    case 'listCheckDataSummary':
+        // 網頁版程式用
+        // 回傳 盤點明細檔(inv_check) 公司別+倉庫別+盤點現有庫檔上傳日期 的摘要給使用者挑選;來批次改盤點明細檔 內的 盤點現有庫檔上傳日期(因為使用者挑選錯的盤點現有庫檔上傳日，盤點之後才發現選錯了)
+        echo listCheckDataSummary();
+        break;
+    case 'updateCheckDataBatch':
+         // 網頁版程式用
+         // 批次更新 盤點明細檔(inv_check) 的 倉別 + 現有庫檔上傳日(因為使用者挑選錯的盤點現有庫檔上傳日)
+        echo updateCheckDataBatch();
+        break;
     case 'insertByBarcode':
         // app 手機程式用
         // 盤點人員掃條碼後;insert 一筆資料至盤點檔(inv_check);並回傳 新增 id 及 產品基本資料
@@ -460,7 +470,7 @@ function listCheckData()
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ################################
-# 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+# 回傳 盤點現有庫存檔(inv_stock) 公司別+倉庫別+盤點現有庫檔上傳日期 的摘要給使用者挑選
 #################################
 function listStockDataSummary()
 {
@@ -475,6 +485,44 @@ function listStockDataSummary()
     }
 
     $tbl1             = $comp_id . "_inv_stock"; // 現有庫存檔
+    $searchCondition =  "comp_id = '{$comp_id}' ";
+
+    $sql =  "select distinct comp_id , c_house , check_date from `$tbl1`  WHERE " . $searchCondition;
+    // $sql =  "select distinct  comp_id , c_house , check_date from `$tbl1`  " ;
+    $result          = $db->kyc_sqlFetch_assoc($sql);
+    $all = array();
+    $count = 0;
+    foreach ($result as $datas) {
+        $all[] = $datas;
+        $count ++;
+    }
+    if($count == 0){
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "查不到資料";
+    } else {
+        $r['responseStatus']  = "OK";
+        $r['responseMessage'] = "";
+        $r['responseArray']   = $all;
+    }
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+################################
+# 回傳 盤點明細檔(inv_check) 公司別+倉庫別+盤點現有庫檔上傳日期 的摘要給使用者挑選;來批次改盤點明細檔 內的 盤點現有庫檔上傳日期(因為使用者挑選錯的盤點現有庫檔上傳日，盤點之後才發現選錯了)
+#################################
+function listCheckDataSummary()
+{
+    global $db;
+    $r   = array();
+    $comp_id = (isset($_SESSION["comp_id"])) ? $_SESSION["comp_id"] : $_POST["comp_id"];    // 公司別
+
+    if (!$comp_id) {
+        $r['responseStatus']  = "FAIL";
+        $r['responseMessage'] = "";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl1             = $comp_id . "_inv_check"; // 盤點明細檔
     $searchCondition =  "comp_id = '{$comp_id}' ";
 
     $sql =  "select distinct comp_id , c_house , check_date from `$tbl1`  WHERE " . $searchCondition;
@@ -620,7 +668,7 @@ function stockExport()
 
     $comp_id = $_SESSION["comp_id"];    // 公司別
     $c_house = $_POST["c_house"];       // 倉庫別
-    $check_date = $_POST["check_date"]; // 盤點日期
+    $check_date = $_POST["check_date"]; // 現有庫存上傳日期
 
     $stockData = [];
 
@@ -801,6 +849,42 @@ function updateCheckData()
     $sqlArr         = array();
     $sqlArr['check_qty'] = $check_qty;
     $sqlArr['c_note'] = $c_note;
+
+    $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
+
+    $r['responseStatus']  = "OK";
+    $r['responseMessage'] = "";
+
+    return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+###############################
+# 批次更新 盤點明細檔(inv_check) 的 倉別 + 現有庫檔上傳日(因為使用者挑選錯的盤點現有庫檔上傳日)
+#################################
+function updateCheckDataBatch()
+{
+    $comp_id      = $_POST["comp_id"];    // 公司別
+    $c_house      = $_POST["c_house"];    // 倉庫別
+    $check_date   = new DateTime($_POST["check_date"]); // 現有庫存上傳日
+    $check_date   = $check_date->format('Y-m-d H:i:s');
+
+    $new_c_house      = $_POST["new_c_house"];    // 新的 倉庫別
+    $new_check_date   = new DateTime($_POST["new_check_date"]); // 新的 現有庫存上傳日
+    $new_check_date   = $new_check_date->format('Y-m-d H:i:s');
+
+    global $db;
+    $r   = array();
+    if (!$comp_id or !$c_house or !$check_date) {
+        $r['responseStatus']  = "FAIL";
+        return json_encode($r, JSON_UNESCAPED_UNICODE);
+    }
+
+    $tbl             = $comp_id . "_inv_check"; // 盤點異動檔
+    $updateCondition =  "comp_id = '{$comp_id}' AND c_house = '{$c_house}' AND ";
+    $updateCondition .= "check_date = '{$check_date}'  ";
+
+    $sqlArr         = array();
+    $sqlArr['c_house'] = $new_c_house;
+    $sqlArr['check_date'] = $new_check_date;
 
     $db->kyc_sqlUpdate($tbl, $sqlArr, $updateCondition);
 
