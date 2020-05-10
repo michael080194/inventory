@@ -73,12 +73,14 @@
           // test_insertBySearchStock(); // 查詢到資料後;將所選取到之資料儲存
           // test_insertByInputPartno(); // 儲存使用者 直接輸入產品編號及備註之資料
           // update_check_data(); // 更新盤點數量 by 盤點異動檔 的序號
+          update_check_data_batch(); // 批次更新 盤點明細檔(inv_check) 的 倉別 + 現有庫檔上傳日(因為使用者挑選錯的盤點現有庫檔上傳日)
           // delete_check_data(); // delete data by 盤點異動檔 的序號
           // list_check_data(); // 顯示 盤點異動檔 資料
           // search_stock(); // 查詢 現有庫存檔
           // gatherBarcode(); // 收集條碼
            // check_stock_data_exist();// 檢查 盤點庫存檔(inv_stock)是否重複 by 公司別+倉庫別+盤點檔上傳日期
-           list_stock_data_summary(); // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+           // list_stock_data_summary(); // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+          //  list_check_data_summary(); // 回傳 盤點明細檔(inv_check) 公司別+倉庫別+盤點現有庫檔上傳日期 的摘要給使用者挑選;來批次改盤點明細檔 內的 盤點現有庫檔上傳日期(因為使用者挑選錯的盤點現有庫檔上傳日，盤點之後才發現選錯了)
         });
         function test_login(){
           var pass0 = {};
@@ -286,6 +288,37 @@
           })
         }
 
+        function update_check_data_batch(){
+          var pass0 = {};
+          pass0.op   = "updateCheckDataBatch";
+          pass0.comp_id       = "1284";
+          pass0.c_house       = "01";
+          pass0.check_date = "2020-04-30"
+
+          pass0.new_c_house       = "01";
+          pass0.new_check_date = "2020-05-09"
+
+          $.ajax({
+            url: url1,
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+                alert(msg);
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
         function list_check_data(){
           var pass0 = {};
           pass0.op   = "listCheckData";
@@ -358,6 +391,38 @@
         function list_stock_data_summary(){
           var pass0 = {};
           pass0.op   = "listStockDataSummary";
+          pass0.comp_id       = "1284";
+
+          $.ajax({
+            url: url1,
+            method:"POST",
+            data:pass0,
+            beforeSend:function(xhr) {
+
+              },
+            success:function(data, xhr, status) {
+                var data1 = JSON.parse(data);
+                msg= data1["responseStatus"];   // if  SUCCESS return content array
+
+                if(msg=="OK"){
+                  product= data1["responseArray"];
+                  $.each(product, function(key, value) {
+                      console.log(value["c_house"] + ":" + value["check_date"]);
+                  });
+                }
+              },
+            complete:function(xhr, status) {
+                $('.loader').css('display','none');
+              },
+            error:function(xhr, status) {
+
+              }
+          })
+        }
+
+        function list_check_data_summary(){
+          var pass0 = {};
+          pass0.op   = "listCheckDataSummary";
           pass0.comp_id       = "1284";
 
           $.ajax({
