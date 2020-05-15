@@ -25,7 +25,7 @@
 <{include file='loader.tpl' }>
 
 <div class="container">
-    <h1 class="pt-4">刪除現有庫存</h1>
+    <h1 class="pt-4">刪除上傳庫存檔及其所有盤點明細資料</h1>
     <hr>
     <!-- <form action="j00_stock.php" method="post" enctype="multipart/form-data"> -->
     <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate>
@@ -159,7 +159,8 @@
     function list_check_data_summary() {
         var url1 = "/inventory/api/inventoryApi.php";
         var pass0 = {};
-        pass0.op = "listCheckDataSummary";
+        // pass0.op = "listCheckDataSummary";
+        pass0.op = "listStockDataSummary";
 
         $.ajax({
             url: url1,
