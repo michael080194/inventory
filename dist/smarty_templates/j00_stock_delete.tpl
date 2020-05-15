@@ -32,25 +32,16 @@
         <input type="hidden" name="op" value="deleteStockData">
 
         <div class="form-row">
-            <div class="col-sm-6">
+            <div class="col-sm-12">
                 <div class="form-group">
-                    <input type="text" name="c_house" class="form-control" placeholder="倉庫別" title="倉庫別" autofocus required>
-                    <div class="invalid-feedback">請輸入倉庫別</div>
+                    <select class="form-control list-check-data-summary" onchange="load_data_to_hidden_input()" autofocus required>
+                        <option value="" disabled selected>請選擇倉別和庫存上傳日</option>
+                    </select>
+                    <div class="invalid-feedback">請選擇倉別和庫存上傳日</div>
                 </div>
             </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <div class="input-group date datetimepicker">
-                        <input type="text" name="check_date" class="form-control" placeholder="盤點日期" title="盤點日期" autofocus required>
-                        <div class="input-group-append">
-                            <span class="input-group-addon">
-                                <span class="far fa-calendar-alt"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="invalid-feedback">請輸入盤點日期</div>
-                </div>
-            </div>
+            <input type="hidden" name="c_house" class="form-control" placeholder="倉庫別" title="倉庫別" autofocus required>
+            <input type="hidden" name="check_date" class="form-control" placeholder="盤點日期" title="盤點日期" autofocus required>
         </div>
 
         <div class="alert alert-text" role="alert"></div>
@@ -74,6 +65,9 @@
     (function() {
         'use strict';
         window.addEventListener('load', function() {
+            // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
+            list_check_data_summary();
+
             // Fetch all forms we want to apply custom validation styles
             let forms = document.getElementsByClassName('needs-validation');
             // Loop over them and prevent submission
@@ -131,5 +125,52 @@
                 }, 1000);
             }
         });
+    }
+
+    function list_check_data_summary() {
+        var url1 = "/inventory/api/inventoryApi.php";
+        var pass0 = {};
+        pass0.op = "listCheckDataSummary";
+
+        $.ajax({
+            url: url1,
+            method: "POST",
+            data: pass0,
+            beforeSend: function (xhr) {
+                $('.loader').css('display', 'flex');
+            },
+            success: function (response, xhr, status) {
+                response = JSON.parse(response);
+                msg = response["responseStatus"]; // if SUCCESS return content array
+
+                if (msg == "OK") {
+                    // render `c_house` && `check_date` to select options
+                    product = response["responseArray"];
+                    let selectInput = $('.list-check-data-summary');
+                    $.each(product, function (key, value) {
+                        let c_house    = value["c_house"];
+                        let check_date = value["check_date"];
+                        check_date = check_date.split(' ')[0];
+                        let details = `倉別：${c_house}，庫存上傳日：${check_date}`;
+                        let option = `<option value="${c_house}:${check_date}">${details}</option>`;
+                        selectInput.append(option);
+                    });
+                }
+                $('.loader').css('display', 'none');
+            },
+            error: function (xhr, status) {
+                // `status` will return 'error'
+                console.log('xhr: ', xhr);
+                $('.loader').css('display', 'none');
+            }
+        })
+    }
+
+    function load_data_to_hidden_input() {
+        let value = $('.list-check-data-summary').val();
+        let c_house = value.split(':')[0];
+        let check_date = value.split(':')[1];
+        $('#form-stock-excel input[name="c_house"]').val(c_house);
+        $('#form-stock-excel input[name="check_date"]').val(check_date);
     }
 </script>

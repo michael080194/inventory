@@ -191,7 +191,7 @@
                         let c_house    = value["c_house"];
                         let check_date = value["check_date"];
                         check_date = check_date.split(' ')[0];
-                        let details = `倉庫別：${c_house}，盤點日期：${check_date}`;
+                        let details = `倉別：${c_house}，庫存上傳日：${check_date}`;
                         let option = `<option value="${c_house}:${check_date}">${details}</option>`;
                         selectInput.append(option);
                     });
