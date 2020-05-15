@@ -78,13 +78,42 @@
                         event.stopPropagation();
                     } else {
                         event.preventDefault();
-                        kyc_stock_delete(form);
+                        check_password_delete(prompt('請輸入密碼：'), form);
                     }
                     form.classList.add('was-validated');
                 }, false);
             });
         }, false);
     })();
+
+    function check_password_delete(pwd, form) {
+		var url1 = "/inventory/api/inventoryApi.php";
+        var pass0 = {};
+        pass0.op = "getCompId";
+
+        $.ajax({
+            url: url1,
+            method: 'POST',
+            data: pass0,
+            success: function(response, xhr, status) {
+                let PWD = '';
+                if (response != '') {
+                    let currentDatetime = new Date().toLocaleString('zh-TW', {timeZone: 'Asia/Taipei'});
+                    let d = currentDatetime.split(' ')[0];
+                    let year = d.split('/')[0];
+                    let month = (d.split('/')[1] < 10) ? ('0' + d.split('/')[1]) : (d.split('/')[1]);
+                    let day = (d.split('/')[2] < 10) ? ('0' + d.split('/')[2]) : (d.split('/')[2]);
+                    PWD = response + year + month + day;
+                }
+                if (pwd == PWD) kyc_stock_delete(form);
+                else alert('密碼錯誤。');
+            },
+            error: function(xhr, status) {
+                // `status` will return 'error'
+                console.log('xhr: ', xhr);
+            }
+        });
+    }
 
     function kyc_stock_delete(form) {
 		var url1 = "/inventory/api/inventoryApi.php";

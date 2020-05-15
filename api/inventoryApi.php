@@ -36,6 +36,11 @@ switch ($op) {
         // 檢查 盤點庫存檔(inv_stock)是否重複 by 公司別+倉庫別+盤點檔上傳日期
         echo checkStockDataExist();
         break;
+    case 'getCompId':
+        // 網頁版程式用
+        // 回傳 SESSION 儲存的 公司別
+        echo getCompId();
+        break;
     case 'listStockDataSummary':
         // 網頁版程式用
         // 回傳 盤點庫存檔(inv_stock) 公司別+倉庫別+盤點檔上傳日期 的摘要給使用者挑選
@@ -261,6 +266,12 @@ function deleteStockData()
     $r['responseMessage'] = "";
 
     return json_encode($r, JSON_UNESCAPED_UNICODE);
+}
+###############################
+# 回傳 SESSION 儲存的 公司別
+#################################
+function getCompId() {
+    return $_SESSION["comp_id"]; // 公司別
 }
 ################################
 # 盤點人員掃條碼後將資料送雲端
