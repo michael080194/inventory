@@ -27,13 +27,13 @@
             <div class="navbar-collapse collapse" id="navbar-main">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="j00_stock_import.php">資料匯入</a>
+                        <a class="nav-link" href="j00_stock_import.php">庫存檔匯入</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="j00_stock_export.php">資料匯出</a>
+                        <a class="nav-link" href="j00_stock_export.php">盤點檔匯出</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="j00_stock_delete.php">資料刪除</a>
+                        <a class="nav-link" href="j00_stock_delete.php">清除資料</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="j00_stock_app_download.php">APP 下載</a>
