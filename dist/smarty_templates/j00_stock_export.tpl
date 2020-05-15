@@ -91,12 +91,6 @@
 
 <!-- Custom form validations -->
 <script>
-    $('.datetimepicker').datetimepicker({
-        // date: new Date(),
-        format: 'YYYY-MM-DD',
-        locale: moment.locale('zh-tw'),
-    });
-
     (function() {
         'use strict';
         window.addEventListener('load', function() {

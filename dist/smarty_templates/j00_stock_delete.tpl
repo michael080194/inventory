@@ -71,19 +71,6 @@
 
 <!-- Custom form validations -->
 <script>
-    $('.custom-file-input').change(function() {
-        let filename = $('#stock-excel').val().split('\\').slice(-1)[0];
-        // Prevent the value from null: it will be null when no file was selected
-        filename = (filename == '') ? '選擇檔案' : filename;
-        $('#stock-excel').next().text(filename);
-    });
-
-    $('.datetimepicker').datetimepicker({
-        // date: new Date(),
-        format: 'YYYY-MM-DD',
-        locale: moment.locale('zh-tw'),
-    });
-
     (function() {
         'use strict';
         window.addEventListener('load', function() {
