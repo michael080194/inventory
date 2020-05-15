@@ -25,7 +25,7 @@
 <{include file='loader.tpl' }>
 
 <div class="container">
-    <h1 class="pt-4">匯入現有庫存</h1>
+    <h1 class="pt-4">匯入現有庫存檔</h1>
     <hr>
     <!-- <form action="j00_stock.php" method="post" enctype="multipart/form-data"> -->
     <form id="form-stock-excel" class="needs-validation" autocomplete="off" novalidate>
