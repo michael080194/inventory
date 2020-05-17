@@ -1,12 +1,12 @@
 <{include file='header.tpl'}>
 
  <{if isset($users) }>
- <!-- <div class="row"> -->
+<div class="container pt-4">
   <div class="row">
      <div class="col-sm-6">
        <h2>資料列表<small>（共 <{$total}> 筆資料）</small></h2>
      </div>
-     <div class="col-sm-12">
+     <div class="col-sm-6">
          <div class="text-right">
              <a href="j00_user.php?op=user_form" class="btn btn-primary">新增使用者</a>
          </div>
@@ -46,7 +46,7 @@
     </tbody>
   </table>
   <{$bar}>
-<!-- </div>   -->
+</div>
 <{/if}>
 <{include file='footer.tpl'}>
 <script src="../../plugin/bootbox.min.js"></script>
