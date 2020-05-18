@@ -109,8 +109,8 @@ Vue.component('page-index', {
             var self = this;
 
             var optionValue = self.c_houseAndCheck_date;
-            self.c_house = optionValue.split(':')[0];
-            self.check_date = optionValue.split(':')[1];
+            self.c_house = optionValue.split('#####')[0];
+            self.check_date = optionValue.split('#####')[1];
         },
         startInventory: function () {
             console.log('Start Inventory......');
