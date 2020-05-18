@@ -42,10 +42,7 @@ Vue.component('page-index', {
 
             if (foolProofResult !== 'ok') {
                 console.log('Check Inventory Failed.');
-                app.dialog.alert('請輸入所有資料。', function () {
-                    // 關閉提示框後自動 focus on input
-                    document.querySelector(`input[name="${foolProofResult}"]`).focus();
-                });
+                app.dialog.alert('請選擇欲顯示之資料');
             }
             else {
                 var params = {
@@ -125,10 +122,7 @@ Vue.component('page-index', {
 
             if (foolProofResult !== 'ok') {
                 console.log('Start Inventory Failed.');
-                app.dialog.alert('請輸入所有資料。', function () {
-                    // 關閉提示框後自動 focus on input
-                    document.querySelector(`input[name="${foolProofResult}"]`).focus();
-                });
+                app.dialog.alert('請選擇欲顯示之資料');
             }
             else {
                 var params = {
