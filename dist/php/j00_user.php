@@ -80,7 +80,6 @@ function user_form($id = "") {
     $row['form_title'] = "新增";
   }
 
-
   #把變數送至樣板
   $smartyTpl->assign('row', $row);
 }
@@ -92,7 +91,8 @@ function save_user($id = "")
 {
     global  $db , $tbl1;
     $pass  = password_hash($_POST["pass"], PASSWORD_DEFAULT);
-
+    $id=$_POST["id"];
+    
     $sqlArr=array();
     $sqlArr['user']       = $_POST["user"];
     $sqlArr['name']       = $_POST["name"];
@@ -103,7 +103,8 @@ function save_user($id = "")
 
     #取得預設值
     if ($id) {
-      $db->kyc_sqlReplace($tbl1, $sqlArr, "UPDATE");
+    //   $db->kyc_sqlReplace($tbl1, $sqlArr, "UPDATE");
+      $db->kyc_sqlUpdate($tbl1, $sqlArr, " id = $id");
       $return_id = $id;
     } else {
       $return_id = $db->kyc_sqlReplace($tbl1, $sqlArr, "ADD");
