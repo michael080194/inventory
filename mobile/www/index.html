@@ -157,7 +157,7 @@
                 </f7-list-item>
             </f7-list>
             <f7-list media-list v-else>
-                <f7-list-item title="查無庫存"></f7-list-item>
+                <f7-list-item title="查無盤點資料"></f7-list-item>
             </f7-list>
         </f7-page>
     </template>
@@ -192,7 +192,7 @@
                 </f7-row>
             </f7-block>
 
-            <f7-block-title v-if="searchedItems.length">現有庫存結果：</f7-block-title>
+            <f7-block-title v-if="searchedItems.length">現有庫存檔資料：</f7-block-title>
             <f7-list media-list>
                 <f7-list-item swipeout
                     v-for="(item, key, index) in searchedItems"
