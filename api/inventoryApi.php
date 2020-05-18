@@ -426,7 +426,7 @@ function insertByInputPartno()
     $sqlArr['check_date'] = $check_date; // 盤點日期
     $sqlArr['check_user'] = $user;       // 盤點人員
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
-    $sqlArr['barcode']   = $c_partno;    // 條碼編號
+    $sqlArr['barcode']    = $c_partno;   // 條碼編號
     $sqlArr['check_qty']  = $c_qty;      // 盤點數量
     $sqlArr['c_note']     = $c_descrp;   // 備註說明
     $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
