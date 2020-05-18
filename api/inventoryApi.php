@@ -355,7 +355,9 @@ function insertBySearchStock()
     $c_unit       = $_POST["c_unit"];      // 單位
     $barcode      = $_POST["barcode"];    // 條碼
     $c_qty        = $_POST["c_qty"];      // 盤點數量
-
+    if($barcode == ""){
+      $barcode = $_POST["c_partno"];   // 產品編號
+    }
     global $db;
     if (!$comp_id or !$c_house or !$user) {
         $r   = array();
@@ -424,6 +426,7 @@ function insertByInputPartno()
     $sqlArr['check_date'] = $check_date; // 盤點日期
     $sqlArr['check_user'] = $user;       // 盤點人員
     $sqlArr['c_partno']   = $c_partno;   // 產品編號
+    $sqlArr['barcode']   = $c_partno;    // 條碼編號
     $sqlArr['check_qty']  = $c_qty;      // 盤點數量
     $sqlArr['c_note']     = $c_descrp;   // 備註說明
     $sqlArr['create_date']  = $dt->format('Y-m-d H:i:s');  // 建檔時間
@@ -680,7 +683,7 @@ function stockExport()
     $comp_id = $_SESSION["comp_id"];    // 公司別
     $c_house = $_POST["c_house"];       // 倉庫別
     $check_date = $_POST["check_date"]; // 現有庫存上傳日期
-
+    // die($comp_id . "**" . $c_house . "**" . $check_date );
     $stockData = [];
 
     // 抓資料
@@ -691,13 +694,13 @@ function stockExport()
 
     $sql = "select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     LEFT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` group by c_partno) AS b
-    ON a.c_partno = b.c_partno  WHERE " . $searchCondition;
+    from `$tbl2` group by barcode) AS b
+    ON a.barcode = b.barcode  WHERE " . $searchCondition;
     $sql .= " UNION
     select a.* , b.c_partno AS w1partno , b.barcode AS w1barcode , b.check_total , b.c_note from `$tbl1` as a
     RIGHT JOIN (select barcode,c_partno,c_note,sum(check_qty) as check_total
-    from `$tbl2` WHERE {$searchCondition1} group by c_partno) AS b
-    ON a.c_partno = b.c_partno ";
+    from `$tbl2` WHERE {$searchCondition1} group by barcode) AS b
+    ON a.barcode = b.barcode ";
 
     $result = $db->kyc_sqlFetch_assoc($sql);
 
