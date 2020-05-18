@@ -112,7 +112,7 @@
                     <f7-label>倉別和庫存上傳日</f7-label>
                     <f7-input type="select" name="c_houseAndCheck_date" @change="loadDataToC_houseAndCheck_date" :value="c_houseAndCheck_date" @input="c_houseAndCheck_date=$event.target.value">
                         <option value="" disabled selected>請選擇倉別和庫存上傳日</option>
-                        <option v-for="option in optionsOfC_houseAndCheck_date" :value="option.c_house + ':' + option.check_date.split(' ')[0]">倉別：{{option.c_house}}，庫存上傳日：{{option.check_date.split(' ')[0]}}</option>
+                        <option v-for="option in optionsOfC_houseAndCheck_date" :value="option.c_house + '#####' + option.check_date.split(' ')[0]">倉別：{{option.c_house}}，庫存上傳日：{{option.check_date.split(' ')[0]}}</option>
                     </f7-input>
                 </f7-list-item>
                 <!-- <f7-list-item>

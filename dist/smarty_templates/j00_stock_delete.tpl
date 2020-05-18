@@ -182,7 +182,7 @@
                         let check_date = value["check_date"];
                         check_date = check_date.split(' ')[0];
                         let details = `倉別：${c_house}，庫存上傳日：${check_date}`;
-                        let option = `<option value="${c_house}:${check_date}">${details}</option>`;
+                        let option = `<option value="${c_house}#####${check_date}">${details}</option>`;
                         selectInput.append(option);
                     });
                 }
@@ -198,8 +198,8 @@
 
     function load_data_to_hidden_input() {
         let value = $('.list-check-data-summary').val();
-        let c_house = value.split(':')[0];
-        let check_date = value.split(':')[1];
+        let c_house = value.split('#####')[0];
+        let check_date = value.split('#####')[1];
         $('#form-stock-excel input[name="c_house"]').val(c_house);
         $('#form-stock-excel input[name="check_date"]').val(check_date);
     }
