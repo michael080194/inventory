@@ -8,7 +8,7 @@
         </div>
         <div class="panel-body">
             <form class="form-horizontal" action="j00_user.php" method="post" role="form">
-                <input type="hidden" name="id" id="id" value="{$row.id}">
+                <input type="hidden" name="id" id="id" value="<{$row.id}>">
                 <div class="form-group row">
                     <label class="col-sm-3 control-label" for="user">使用者帳號</label>
                     <div class="col-sm-9">
@@ -61,25 +61,29 @@
 <script src="../js/kyc_cm_fun.js"></script>
 <script>
  $(document).ready(function() {
-    disEnterKey(); 
+    disEnterKey();
     $('form').submit(function () {
+        
         if ($.trim($('#user').val())  === '') {
+            alert('使用者帳號不能空白');
             $('.kyc_modal-body').text('使用者帳號不能空白');
             $('#formMsgModal').modal('show');
             return false;
         }
 
         if ($.trim($('#pass').val())  === '') {
+            alert('使用者密碼不能空白');
             $('.kyc_modal-body').text('使用者密碼不能空白');
             $('#formMsgModal').modal('show');
             return false;
-        }        
+        }
 
         if ($.trim($('#name').val())  === '') {
+            alert('姓名不能空白');
             $('.kyc_modal-body').text('姓名不能空白');
             $('#formMsgModal').modal('show');
             return false;
-        }     
-    });     
- });   
+        }
+    });
+ });
 </script>
