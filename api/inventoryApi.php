@@ -446,7 +446,7 @@ function insertByInputPartno()
     return json_encode($r, JSON_UNESCAPED_UNICODE);
 }
 ################################
-# 顯示 公司別+倉庫別+盤點人員+盤點日期 之盤點資料(inv_check)
+# 顯示 公司別+倉庫別+庫存上傳日期+盤點人員 之盤點資料(inv_check)
 #################################
 function listCheckData()
 {
@@ -454,7 +454,7 @@ function listCheckData()
     $comp_id      = $_POST["comp_id"];    // 公司別
     $c_house      = $_POST["c_house"];    // 倉庫別
     $user         = $_POST["user"];       // 盤點人員
-    $check_date   = new DateTime($_POST["check_date"]); // 盤點日期
+    $check_date   = new DateTime($_POST["check_date"]); // 庫存上傳日期
     $check_date   = $check_date->format('Y-m-d H:i:s');
 
     if (!$comp_id or !$user ) {
@@ -468,7 +468,7 @@ function listCheckData()
 
     // $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b   ON a.barcode = b.barcode WHERE " . $searchCondition . " order by a.create_date DESC";
 
-    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit from `$tbl1` as a LEFT JOIN `$tbl2` AS b  ON a.c_partno = b.c_partno WHERE " . $searchCondition . " order by a.create_date DESC";
+    $sql =  "select a.* , b.barcode AS w1barcode , b.c_descrp , b.c_unit , b.c_house from `$tbl1` as a LEFT JOIN `$tbl2` AS b  ON a.barcode = b.barcode AND a.c_house = b.c_house WHERE " . $searchCondition . " order by a.create_date DESC";
 
     $result          = $db->kyc_sqlFetch_assoc($sql);
     $r   = array();
