@@ -87,6 +87,9 @@
     })();
 
     function check_password_delete(pwd, form) {
+        // 密碼為公司別+今日西元年月日
+        // 例如今天是 5/19 公司別 6939
+        // 則密碼為 693920200519
 		var url1 = "/inventory/api/inventoryApi.php";
         var pass0 = {};
         pass0.op = "getCompId";
